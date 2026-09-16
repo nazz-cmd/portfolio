@@ -31,7 +31,9 @@ import {
   Home,
   Menu,
   X,
-  User
+  User,
+  Trophy,
+  ZoomIn
 } from 'lucide-react';
 import { 
   LinkedinIcon, 
@@ -144,10 +146,111 @@ function TiltAboutCard({ children }: { children: React.ReactNode }) {
   );
 }
 
+// 3D Interactive Tilt Certificate Card with Dynamic Perspective, Reactive Shadow & Specular Glare
+function TiltCertificateCard({ 
+  children,
+  className = "",
+  onClick
+}: { 
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tiltStyle, setTiltStyle] = useState({
+    transform: 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+    boxShadow: '0 12px 32px -10px rgba(0,0,0,0.06), 0 4px 12px -2px rgba(0,0,0,0.03)',
+  });
+  const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const rafId = useRef<number | null>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (rafId.current) cancelAnimationFrame(rafId.current);
+
+    rafId.current = requestAnimationFrame(() => {
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      // 3D tilt angles (max ~6.5 degrees)
+      const rotateX = ((y - centerY) / centerY) * -6.5;
+      const rotateY = ((x - centerX) / centerX) * 6.5;
+
+      // Reactive physical shadow offset
+      const shadowX = -rotateY * 2.2;
+      const shadowY = rotateX * 2.2 + 22;
+
+      setTiltStyle({
+        transform: `perspective(1200px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.018, 1.018, 1.018)`,
+        boxShadow: `${shadowX.toFixed(1)}px ${shadowY.toFixed(1)}px 42px -6px rgba(0,0,0,0.13), 0 8px 20px -4px rgba(0,0,0,0.05)`,
+      });
+
+      setGlarePos({
+        x: (x / rect.width) * 100,
+        y: (y / rect.height) * 100,
+        opacity: 0.45,
+      });
+    });
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (rafId.current) cancelAnimationFrame(rafId.current);
+    setIsHovered(false);
+    setTiltStyle({
+      transform: 'perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+      boxShadow: '0 12px 32px -10px rgba(0,0,0,0.06), 0 4px 12px -2px rgba(0,0,0,0.03)',
+    });
+    setGlarePos((prev) => ({ ...prev, opacity: 0 }));
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        ...tiltStyle,
+        transition: isHovered 
+          ? 'transform 0.08s ease-out, box-shadow 0.08s ease-out' 
+          : 'transform 0.55s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.55s cubic-bezier(0.23, 1, 0.32, 1)',
+        willChange: 'transform, box-shadow',
+        transformStyle: 'preserve-3d',
+      }}
+      className={`relative overflow-hidden bg-white rounded-[28px] sm:rounded-[32px] border border-neutral-200/90 cursor-pointer ${className}`}
+    >
+      {/* 3D Specular Glare Reflection Layer following cursor */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-[inherit] transition-opacity duration-300 z-20"
+        style={{
+          opacity: glarePos.opacity,
+          background: `radial-gradient(circle 420px at ${glarePos.x}% ${glarePos.y}%, rgba(255, 255, 255, 0.75), transparent 65%)`,
+        }}
+      />
+      {/* Subtle Inset Specular Top Line */}
+      <div className="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0_1px_1px_rgba(255,255,255,1)]" />
+
+      {/* Content */}
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+}
+
 export default function JonnyCzarPortfolioPage() {
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [roleIndex, setRoleIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [previewCert, setPreviewCert] = useState<{ src: string; title: string; subtitle: string } | null>(null);
   const targetIdRef = useRef<string | null>(null);
   const scrollEndDebounceTimer = useRef<NodeJS.Timeout | null>(null);
   const safetyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -593,10 +696,14 @@ export default function JonnyCzarPortfolioPage() {
               <h3 className="text-[14px] font-semibold text-[#888888] mb-4">
                 Certifications
               </h3>
-              <nav className="space-y-4">
-                <a href="#certifications" className="flex items-center gap-3 text-[15px] font-medium text-[#777777] hover:text-[#111111] transition-colors group">
+              <nav className="space-y-3">
+                <a href="#cert-ombn" className="flex items-center gap-2.5 text-[14px] font-medium text-[#777777] hover:text-[#111111] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#888888] group-hover:bg-black transition-colors shrink-0" />
-                  <span>Licenses &amp; Credentials</span>
+                  <span className="truncate">Juara 1 Informatika OMBN</span>
+                </a>
+                <a href="#cert-revou" className="flex items-center gap-2.5 text-[14px] font-medium text-[#777777] hover:text-[#111111] transition-colors group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#888888] group-hover:bg-black transition-colors shrink-0" />
+                  <span className="truncate">Digital Marketing RevoU</span>
                 </a>
               </nav>
             </div>
@@ -869,82 +976,271 @@ export default function JonnyCzarPortfolioPage() {
 
       {/* 6. LICENSES & CERTIFICATIONS SECTION */}
       <section id="certifications" className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20 md:py-24 pb-24 sm:pb-32 border-t border-neutral-200/70 scroll-mt-20">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-10 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 sm:mb-12 gap-3">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1.5 block">Credentials</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/60 text-amber-800 text-[11px] font-bold uppercase tracking-wider mb-2.5">
+              <Trophy className="w-3.5 h-3.5 text-amber-600" />
+              <span>Verified Honors &amp; Credentials</span>
+            </div>
             <h2 className="font-gt-america text-2xl sm:text-3xl md:text-4xl text-black font-bold tracking-tight">
               Licenses &amp; Certifications
             </h2>
           </div>
-          <p className="text-xs sm:text-sm text-neutral-500 font-normal max-w-sm">
-            Sertifikasi kompetensi, lisensi resmi, dan pengakuan keahlian di bidang teknologi, cloud, dan bisnis digital.
+          <p className="text-xs sm:text-sm text-neutral-500 font-normal max-w-md">
+            Sertifikat penghargaan kejuaraan dan lisensi kompetensi profesional resmi. Hover kursor untuk efek 3D tilt fisik interaktif, dan klik kartu untuk melihat resolusi penuh (Full HD).
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-7">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
           
-          {/* Cert Card 1: Google Cloud & Developer Skills */}
-          <div className="bg-[#f8f8fa] hover:bg-[#f2f2f6] rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 border border-neutral-200/80 shadow-xs transition-all flex flex-col justify-between group">
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-white shadow-2xs border border-neutral-200/60 flex items-center justify-center text-black mb-5 group-hover:scale-105 transition-transform">
-                <GoogleIcon className="w-6 h-6" />
-              </div>
-              <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Google Ecosystem</span>
-              <h3 className="font-gt-america text-base sm:text-lg text-black font-bold tracking-tight mb-2">
-                Google Cloud &amp; AI Literacy
-              </h3>
-              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-                Sertifikasi keahlian teknologi Google Cloud, AI fundamentals, dan developer tools dalam persiapan Google Student Ambassador 2026.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-neutral-200/60 flex items-center justify-between text-xs font-semibold text-neutral-500">
-              <span>Verified Credential</span>
-              <Award className="w-4 h-4 text-emerald-600" />
-            </div>
-          </div>
+          {/* 3D CERTIFICATE CARD 1: Juara 1 Lomba Informatika OMBN 2025 */}
+          <article id="cert-ombn" className="flex flex-col">
+            <TiltCertificateCard 
+              className="group flex-1 flex flex-col shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:shadow-[0_28px_60px_rgba(0,0,0,0.12)] border-neutral-200/80"
+              onClick={() => setPreviewCert({
+                src: '/certificates/sertifikat_juara1_ombn_informatika.png',
+                title: 'Juara 1 Lomba Informatika — OMBN 2025',
+                subtitle: 'Olimpiade Muhammadiyah Berprestasi Nasional Kab. Cirebon • No. 700/I.4.OMBN/2024'
+              })}
+            >
+              {/* Certificate Image Frame Container with Aspect Ratio */}
+              <div className="relative aspect-[16/11.3] w-full bg-[#f4f4f7] border-b border-neutral-100 overflow-hidden flex items-center justify-center p-3 sm:p-4 group/preview">
+                {/* Visual Certificate Paper with Matte Shadow */}
+                <div className="w-full h-full rounded-xl sm:rounded-2xl overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.12)] border border-neutral-200/90 relative bg-white">
+                  <img 
+                    src="/certificates/sertifikat_juara1_ombn_informatika.png" 
+                    alt="Sertifikat Juara 1 Lomba Informatika OMBN 2025 - Nazalan Muaffari" 
+                    className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover/preview:scale-[1.03]"
+                  />
+                  {/* Subtle Gradient Shadow Vignette */}
+                  <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/5 rounded-[inherit]" />
+                </div>
 
-          {/* Cert Card 2: Software Engineering & Web Architecture */}
-          <div className="bg-[#f8f8fa] hover:bg-[#f2f2f6] rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 border border-neutral-200/80 shadow-xs transition-all flex flex-col justify-between group">
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-white shadow-2xs border border-neutral-200/60 flex items-center justify-center text-black mb-5 group-hover:scale-105 transition-transform">
-                <Code2 className="w-6 h-6" />
-              </div>
-              <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Software Engineering</span>
-              <h3 className="font-gt-america text-base sm:text-lg text-black font-bold tracking-tight mb-2">
-                Full-Stack Web Development
-              </h3>
-              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-                Kompetensi rekayasa aplikasi web modern, Next.js, arsitektur basis data relasional, dan integrasi API terukur.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-neutral-200/60 flex items-center justify-between text-xs font-semibold text-neutral-500">
-              <span>Verified Credential</span>
-              <Award className="w-4 h-4 text-emerald-600" />
-            </div>
-          </div>
+                {/* Floating Interactive Zoom Pill Badge */}
+                <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 text-neutral-900 text-xs font-bold shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    <ZoomIn className="w-4 h-4 text-amber-600" />
+                    <span>Perbesar Sertifikat HD</span>
+                  </span>
+                </div>
 
-          {/* Cert Card 3: Digital Business & E-Commerce Operations */}
-          <div className="bg-[#f8f8fa] hover:bg-[#f2f2f6] rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 border border-neutral-200/80 shadow-xs transition-all flex flex-col justify-between group">
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-white shadow-2xs border border-neutral-200/60 flex items-center justify-center text-black mb-5 group-hover:scale-105 transition-transform">
-                <TrendingUp className="w-6 h-6" />
+                {/* Top Corner Trophy Stamp */}
+                <div className="absolute top-5 right-5 sm:top-6 sm:right-6 z-10 pointer-events-none">
+                  <div className="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center shadow-lg border-2 border-white">
+                    <Trophy className="w-5 h-5 text-amber-100" />
+                  </div>
+                </div>
               </div>
-              <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1">Digital Business</span>
-              <h3 className="font-gt-america text-base sm:text-lg text-black font-bold tracking-tight mb-2">
-                E-Commerce &amp; Digital Strategy
-              </h3>
-              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-                Sertifikasi pemahaman analitik bisnis digital, optimasi pencarian pasar daring, dan unit economics platform.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-neutral-200/60 flex items-center justify-between text-xs font-semibold text-neutral-500">
-              <span>Verified Credential</span>
-              <Award className="w-4 h-4 text-emerald-600" />
-            </div>
-          </div>
+
+              {/* Certificate Editorial Details */}
+              <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-100/80 text-amber-800 text-[11px] font-extrabold uppercase tracking-wider">
+                      Juara 1 • 1st Place Winner
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-600 text-[11px] font-semibold">
+                      Desember 2024
+                    </span>
+                  </div>
+
+                  <h3 className="font-gt-america text-xl sm:text-2xl text-neutral-900 font-bold tracking-tight mb-2 leading-snug">
+                    Juara 1 Lomba Informatika — OMBN 2025
+                  </h3>
+
+                  <p className="text-xs sm:text-sm font-semibold text-neutral-600 mb-3 flex items-center gap-1.5">
+                    <Award className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Pimpinan Pusat Muhammadiyah • Tingkat Kab. Cirebon</span>
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal mb-5">
+                    Meraih Juara 1 dalam Olimpiade Muhammadiyah Berprestasi Nasional jenjang SMA/SMK/MA bidang Informatika dan Teknologi Komputer, membuktikan kapabilitas logika algoritmik, pemrograman, dan penguasaan fondasi ilmu informatika.
+                  </p>
+
+                  {/* Metadata Chips */}
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-6">
+                    <span className="px-2.5 py-1 rounded-lg bg-neutral-50 border border-neutral-200/70 text-[11px] font-medium text-neutral-700">
+                      No: 700/I.4.OMBN/2024
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-neutral-50 border border-neutral-200/70 text-[11px] font-medium text-neutral-700">
+                      Bidang Informatika
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-neutral-50 border border-neutral-200/70 text-[11px] font-medium text-neutral-700">
+                      Majelis Dikdasmen &amp; PNF
+                    </span>
+                  </div>
+                </div>
+
+                {/* Footer Validation Strip */}
+                <div className="pt-4 border-t border-neutral-100 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Terverifikasi Juara 1</span>
+                  </div>
+                  <span className="text-neutral-500 font-semibold group-hover:text-black transition-colors flex items-center gap-1">
+                    <span>Lihat Full HD</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </div>
+            </TiltCertificateCard>
+          </article>
+
+          {/* 3D CERTIFICATE CARD 2: RevoU Intro to Digital Marketing */}
+          <article id="cert-revou" className="flex flex-col">
+            <TiltCertificateCard 
+              className="group flex-1 flex flex-col shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:shadow-[0_28px_60px_rgba(0,0,0,0.12)] border-neutral-200/80"
+              onClick={() => setPreviewCert({
+                src: '/certificates/sertifikat_revou_digital_marketing.png',
+                title: 'Intro to Digital Marketing — RevoU',
+                subtitle: 'PT Revolusi Cita Edukasi • Matteo Sutto CEO & Co-founder • April 2024'
+              })}
+            >
+              {/* Certificate Image Frame Container with Aspect Ratio */}
+              <div className="relative aspect-[16/11.3] w-full bg-[#f4f4f7] border-b border-neutral-100 overflow-hidden flex items-center justify-center p-3 sm:p-4 group/preview">
+                {/* Visual Certificate Paper with Matte Shadow */}
+                <div className="w-full h-full rounded-xl sm:rounded-2xl overflow-hidden shadow-[0_8px_25px_rgba(0,0,0,0.12)] border border-neutral-200/90 relative bg-white">
+                  <img 
+                    src="/certificates/sertifikat_revou_digital_marketing.png" 
+                    alt="Sertifikat RevoU Intro to Digital Marketing - Nazalan Muaffari" 
+                    className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover/preview:scale-[1.03]"
+                  />
+                  {/* Subtle Gradient Shadow Vignette */}
+                  <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/5 rounded-[inherit]" />
+                </div>
+
+                {/* Floating Interactive Zoom Pill Badge */}
+                <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 text-neutral-900 text-xs font-bold shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    <ZoomIn className="w-4 h-4 text-blue-600" />
+                    <span>Perbesar Sertifikat HD</span>
+                  </span>
+                </div>
+
+                {/* Top Corner RevoU Badge */}
+                <div className="absolute top-5 right-5 sm:top-6 sm:right-6 z-10 pointer-events-none">
+                  <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg border-2 border-white">
+                    <Award className="w-5 h-5 text-blue-100" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Certificate Editorial Details */}
+              <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-100/80 text-blue-800 text-[11px] font-extrabold uppercase tracking-wider">
+                      Certified Online Course
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-600 text-[11px] font-semibold">
+                      April 2024
+                    </span>
+                  </div>
+
+                  <h3 className="font-gt-america text-xl sm:text-2xl text-neutral-900 font-bold tracking-tight mb-2 leading-snug">
+                    Intro to Digital Marketing — RevoU
+                  </h3>
+
+                  <p className="text-xs sm:text-sm font-semibold text-neutral-600 mb-3 flex items-center gap-1.5">
+                    <Award className="w-4 h-4 text-blue-600 shrink-0" />
+                    <span>PT Revolusi Cita Edukasi (RevoU)</span>
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal mb-5">
+                    Menuntaskan program intensif 1 minggu penguasaan fundamental strategi pemasaran digital: Paid Advertising (Meta &amp; Google Ads), Social Media Organic Strategy, Analitik Funnel Konversi, dan Riset Pasar.
+                  </p>
+
+                  {/* Metadata Chips */}
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-6">
+                    <span className="px-2.5 py-1 rounded-lg bg-neutral-50 border border-neutral-200/70 text-[11px] font-medium text-neutral-700">
+                      Performance Marketing
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-neutral-50 border border-neutral-200/70 text-[11px] font-medium text-neutral-700">
+                      Social Media Ads
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-neutral-50 border border-neutral-200/70 text-[11px] font-medium text-neutral-700">
+                      Marketing Analytics
+                    </span>
+                  </div>
+                </div>
+
+                {/* Footer Validation Strip */}
+                <div className="pt-4 border-t border-neutral-100 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Lulus &amp; Tersertifikasi</span>
+                  </div>
+                  <span className="text-neutral-500 font-semibold group-hover:text-black transition-colors flex items-center gap-1">
+                    <span>Lihat Full HD</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </div>
+            </TiltCertificateCard>
+          </article>
 
         </div>
       </section>
+
+      {/* FULL-RESOLUTION CERTIFICATE ZOOM MODAL (HIGH DEF PREVIEW) */}
+      {previewCert && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 md:p-10 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setPreviewCert(null)}
+        >
+          <div 
+            className="relative max-w-5xl w-full bg-neutral-900 border border-neutral-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Topbar */}
+            <div className="px-5 sm:px-7 py-4 bg-neutral-900/90 border-b border-neutral-800 flex items-center justify-between gap-4">
+              <div className="min-w-0">
+                <h4 className="font-bold text-sm sm:text-base text-white truncate">
+                  {previewCert.title}
+                </h4>
+                <p className="text-xs text-neutral-400 truncate">
+                  {previewCert.subtitle}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <a 
+                  href={previewCert.src}
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="px-3 py-1.5 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                  title="Buka gambar di tab baru"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Buka Tab Baru</span>
+                </a>
+                <button
+                  onClick={() => setPreviewCert(null)}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white flex items-center justify-center transition-colors"
+                  aria-label="Tutup pratinjau"
+                >
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Image Viewport */}
+            <div className="p-3 sm:p-6 overflow-auto flex items-center justify-center bg-neutral-950/50">
+              <img 
+                src={previewCert.src} 
+                alt={previewCert.title}
+                className="max-h-[72vh] w-auto h-auto max-w-full object-contain rounded-lg shadow-2xl border border-neutral-800"
+              />
+            </div>
+
+            {/* Modal Bottom Bar */}
+            <div className="px-5 sm:px-7 py-3 bg-neutral-900/80 border-t border-neutral-800/80 flex items-center justify-between text-[11px] sm:text-xs text-neutral-400">
+              <span>Klik area di luar untuk menutup (atau tombol X)</span>
+              <span className="font-semibold text-neutral-300">Nazalan Muaffari Official Portfolio</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
