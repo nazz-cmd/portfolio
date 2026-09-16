@@ -686,7 +686,7 @@ export default function JonnyCzarPortfolioPage() {
                 </a>
                 <a href="#card-shopee" className="flex items-center gap-3 text-[15px] font-medium text-[#777777] hover:text-[#111111] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#888888] group-hover:bg-black transition-colors shrink-0" />
-                  <span>Shopee Store Pribadi</span>
+                  <span>NAZZGRAM Digital Store</span>
                 </a>
               </nav>
             </div>
@@ -891,44 +891,86 @@ export default function JonnyCzarPortfolioPage() {
               </div>
             </article>
 
-            {/* ELEVATION CARD 4: Shopee E-Commerce Store */}
+            {/* ELEVATION CARD 4: NAZZGRAM Official Store */}
             <article id="card-shopee" className="rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
-              <div className="bg-[#f3effe] p-6 sm:p-10 md:p-14">
-                <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-purple-900 mb-2.5 sm:mb-3 font-semibold">
-                  DIGITAL COMMERCE
-                </p>
+              <div className="bg-[#fcf5f2] p-6 sm:p-10 md:p-14">
+                <div className="flex flex-wrap items-center gap-2 mb-2.5 sm:mb-3">
+                  <span className="font-gt-america text-[13px] sm:text-[15px] uppercase tracking-wider text-[#d03b1b] font-bold">
+                    DIGITAL COMMERCE &amp; VENTURE
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-orange-100 text-[#d03b1b] text-[11px] font-bold">
+                    5+ Tahun Beroperasi
+                  </span>
+                </div>
                 <h2 className="font-gt-america text-2xl sm:text-3xl md:text-[42px] lg:text-[46px] text-neutral-900 tracking-tight leading-[1.14] mb-4 sm:mb-5 font-bold">
-                  Shopee Store Pribadi
+                  NAZZGRAM Official Store
                 </h2>
                 <p className="text-[15px] sm:text-[17px] text-[#555555] max-w-2xl leading-relaxed mb-8 sm:mb-10 font-normal">
-                  Mengoperasikan toko ritel e-commerce pribadi: riset kata kunci algoritma pencarian Shopee, penetapan harga kompetitif, pemenuhan pesanan same-day dispatch, dan menjaga skor ulasan pelanggan ★ 4.8+.
+                  Membangun dan mengoperasikan brand toko digital &amp; retail e-commerce <strong className="text-neutral-900 font-semibold">NAZZGRAM</strong> selama lebih dari 5 tahun di marketplace Shopee. Menghadirkan solusi langganan digital, kecerdasan buatan (ChatGPT Pro, Gemini AI Pro), serta produk teknologi &amp; kebutuhan rumah dengan mempertahankan standar kepuasan pelanggan bintang ★ 4.9 dari 7.500+ ulasan pembeli terverifikasi.
                 </p>
 
-                {/* Card Mockup Frame */}
-                <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-neutral-200/60 max-w-3xl mx-auto overflow-hidden">
-                  <div className="flex items-center justify-between border-b border-neutral-100 pb-3 sm:pb-4 mb-3 sm:mb-4">
+                {/* Real Store Showcase Mockup Frame */}
+                <div className="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-5 shadow-[0_15px_35px_rgba(0,0,0,0.06)] border border-neutral-200/80 max-w-3xl mx-auto overflow-hidden">
+                  {/* Browser / Marketplace Top Header */}
+                  <div className="flex items-center justify-between border-b border-neutral-100 pb-3 mb-3 px-1">
                     <div className="flex items-center gap-2">
-                      <ShoppingBag className="w-4 h-4 text-orange-500 shrink-0" />
-                      <span className="text-[11px] sm:text-xs font-bold text-neutral-800 truncate">Shopee Seller Centre • Store Overview</span>
+                      <div className="w-6 h-6 rounded-lg bg-[#ee4d2d] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                        <ShoppingBag className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-[12px] sm:text-xs font-bold text-neutral-900">Shopee Marketplace • NAZZGRAM Profile</span>
                     </div>
-                    <span className="text-[11px] sm:text-xs font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-purple-50 text-purple-700 shrink-0">★ 4.8+ Star Rating</span>
+                    <span className="text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                      ★ 4.9 (7,5RB Penilaian)
+                    </span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-left">
-                    <div className="p-3 sm:p-3.5 rounded-xl bg-purple-50/50 border border-purple-100">
-                      <p className="text-xs text-neutral-500 font-medium">Performa Pesanan</p>
-                      <p className="text-sm font-bold text-neutral-900 mt-1">Same-Day Dispatch</p>
-                      <p className="text-xs text-purple-700 font-semibold mt-1">Tingkat Pembatalan 0.0%</p>
+
+                  {/* Real Store Banner Screenshot */}
+                  <div className="rounded-xl overflow-hidden border border-neutral-200/80 shadow-xs mb-4 bg-neutral-50">
+                    <img 
+                      src="/projects/nazzgram_store.png" 
+                      alt="Toko Shopee NAZZGRAM - 57.6K Followers" 
+                      className="w-full h-auto object-cover block"
+                    />
+                  </div>
+
+                  {/* 4 High-Impact Metric Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-left">
+                    <div className="p-3 sm:p-3.5 rounded-xl bg-orange-50/60 border border-orange-100/90">
+                      <p className="text-[11px] text-neutral-500 font-medium">Pengikut Shopee</p>
+                      <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">57,6RB+</p>
+                      <p className="text-[10px] text-orange-700 font-semibold mt-0.5">Komunitas Loyal</p>
                     </div>
-                    <div className="p-3 sm:p-3.5 rounded-xl bg-purple-50/50 border border-purple-100">
-                      <p className="text-xs text-neutral-500 font-medium">Chat Response Rate</p>
-                      <p className="text-sm font-bold text-neutral-900 mt-1">99.4% Dibalas Cepat</p>
-                      <p className="text-xs text-emerald-600 font-semibold mt-1">Hitungan Menit • Ramah</p>
+                    <div className="p-3 sm:p-3.5 rounded-xl bg-orange-50/60 border border-orange-100/90">
+                      <p className="text-[11px] text-neutral-500 font-medium">Ulasan Pembeli</p>
+                      <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">7,5RB+</p>
+                      <p className="text-[10px] text-amber-700 font-semibold mt-0.5">Rating ★ 4.9 / 5.0</p>
                     </div>
-                    <div className="p-3 sm:p-3.5 rounded-xl bg-purple-50/50 border border-purple-100">
-                      <p className="text-xs text-neutral-500 font-medium">SEO &amp; Kata Kunci</p>
-                      <p className="text-sm font-bold text-neutral-900 mt-1">Top 5 Pencarian</p>
-                      <p className="text-xs text-blue-600 font-semibold mt-1">Optimasi Judul &amp; Gambar HD</p>
+                    <div className="p-3 sm:p-3.5 rounded-xl bg-orange-50/60 border border-orange-100/90">
+                      <p className="text-[11px] text-neutral-500 font-medium">Pengalaman Toko</p>
+                      <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">5+ Tahun</p>
+                      <p className="text-[10px] text-emerald-700 font-semibold mt-0.5">Sejak 2021</p>
                     </div>
+                    <div className="p-3 sm:p-3.5 rounded-xl bg-orange-50/60 border border-orange-100/90">
+                      <p className="text-[11px] text-neutral-500 font-medium">Performa Chat</p>
+                      <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">95%</p>
+                      <p className="text-[10px] text-blue-700 font-semibold mt-0.5">Dibalas Cepat</p>
+                    </div>
+                  </div>
+
+                  {/* Product Keywords Chips */}
+                  <div className="mt-3.5 pt-3 border-t border-neutral-100 flex flex-wrap gap-1.5 sm:gap-2">
+                    <span className="px-2.5 py-1 rounded-lg bg-neutral-100/80 text-[11px] font-semibold text-neutral-700">
+                      ChatGPT Pro &amp; Gemini AI
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-neutral-100/80 text-[11px] font-semibold text-neutral-700">
+                      Tech &amp; Phone Accessories
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-neutral-100/80 text-[11px] font-semibold text-neutral-700">
+                      E-Commerce Search SEO
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-neutral-100/80 text-[11px] font-semibold text-neutral-700">
+                      Marketplace Growth
+                    </span>
                   </div>
                 </div>
               </div>
@@ -936,35 +978,35 @@ export default function JonnyCzarPortfolioPage() {
               {/* Signature Footer Card Bar */}
               <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3 sm:gap-3.5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500 text-white flex items-center justify-center font-bold text-sm sm:text-base shadow-xs shrink-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#ee4d2d] text-white flex items-center justify-center font-bold text-sm sm:text-base shadow-xs shrink-0">
                     <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-neutral-900">Shopee Store</h4>
+                    <h4 className="font-bold text-sm text-neutral-900">NAZZGRAM Store</h4>
                     <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
-                      ★★★★★ <span className="text-neutral-500 font-medium">4.8+ Seller</span>
+                      ★★★★★ <span className="text-neutral-500 font-medium">4.9 • 57.6K Followers</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="hidden sm:flex items-center gap-6 sm:gap-8">
                   <div>
-                    <p className="font-extrabold text-sm text-neutral-900">★ 4.8+</p>
-                    <p className="text-xs text-neutral-500">Customer Rating</p>
+                    <p className="font-extrabold text-sm text-neutral-900">57,6RB+</p>
+                    <p className="text-xs text-neutral-500">Followers Shopee</p>
                   </div>
                   <div>
-                    <p className="font-extrabold text-sm text-neutral-900">99.4%</p>
-                    <p className="text-xs text-neutral-500">Chat Response</p>
+                    <p className="font-extrabold text-sm text-neutral-900">7,5RB+</p>
+                    <p className="text-xs text-neutral-500">Ulasan Pembeli</p>
                   </div>
                 </div>
 
                 <a 
-                  href="https://shopee.co.id" 
+                  href="https://shopee.co.id/nazzgram" 
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-full bg-neutral-900 hover:bg-neutral-800 text-white px-5 sm:px-7 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shrink-0 ml-auto sm:ml-0"
+                  className="rounded-full bg-[#ee4d2d] hover:bg-[#d03b1b] text-white px-5 sm:px-7 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shrink-0 ml-auto sm:ml-0 shadow-xs"
                 >
-                  <span>Lihat Toko</span>
+                  <span>Kunjungi Toko Shopee</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </a>
               </div>
