@@ -675,6 +675,10 @@ export default function JonnyCzarPortfolioPage() {
                 Selected Projects
               </h3>
               <nav className="space-y-4">
+                <a href="#card-ablefy" className="flex items-center gap-3 text-[15px] font-medium text-[#777777] hover:text-[#111111] transition-colors group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#888888] group-hover:bg-black transition-colors shrink-0" />
+                  <span>Ablefy Web Platform</span>
+                </a>
                 <a href="#card-portal" className="flex items-center gap-3 text-[15px] font-medium text-[#777777] hover:text-[#111111] transition-colors group">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#888888] group-hover:bg-black transition-colors shrink-0" />
                   <span>Manajemen Kelas 2026E</span>
@@ -716,6 +720,164 @@ export default function JonnyCzarPortfolioPage() {
           {/* Right Column: Elevation Cards Stack */}
           <div className="flex-1 space-y-12 sm:space-y-16 md:space-y-20 w-full min-w-0">
 
+            {/* ELEVATION CARD 0: Ablefy Platform */}
+            <article id="card-ablefy" className="rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
+              <div className="bg-[#f0f4ff] p-6 sm:p-10 md:p-14">
+                <div className="flex flex-wrap items-center gap-2 mb-2.5 sm:mb-3">
+                  <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-indigo-900 font-semibold">
+                    UNIVERSAL INCLUSIVITY &amp; ASSISTIVE TECH
+                  </p>
+                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-[11px] font-bold">
+                    WCAG 2.1 AAA
+                  </span>
+                </div>
+                <h2 className="font-gt-america text-2xl sm:text-3xl md:text-[42px] lg:text-[46px] text-neutral-900 tracking-tight leading-[1.14] mb-4 sm:mb-5 font-bold">
+                  Ablefy Web Platform
+                </h2>
+                <p className="text-[15px] sm:text-[17px] text-[#555555] max-w-2xl leading-relaxed mb-8 sm:mb-10 font-normal">
+                  Platform web aksesibilitas multi-modal terpadu untuk penyandang disabilitas (Sahabat Netra, Teman Tuli, Disleksia, dan Keterbatasan Motorik) berstandar kepatuhan WCAG 2.1 Level AAA. Dilengkapi Text-to-Speech multi-karakter suara alami, transkripsi wicara real-time (Speech-to-Text), modul kamus &amp; papan interaktif bahasa isyarat BISINDO, tipografi ramah disleksia, serta navigasi suara bebas tangan.
+                </p>
+
+                {/* Desktop Web App Browser Showcase */}
+                <div className="max-w-3xl mx-auto rounded-2xl sm:rounded-3xl overflow-hidden border border-neutral-200/90 bg-white shadow-[0_20px_45px_rgba(0,0,0,0.08)]">
+                  {/* Browser Window Header */}
+                  <div className="bg-[#f8fafc] px-4 py-3 border-b border-neutral-200/80 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-[#ff5f56] inline-block" />
+                      <span className="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block" />
+                      <span className="w-3 h-3 rounded-full bg-[#27c93f] inline-block" />
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-neutral-200 text-xs text-neutral-600 font-mono shadow-2xs">
+                      <span className="text-emerald-600 font-bold">🔒</span>
+                      <span>ablefy.vercel.app</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-bold border border-indigo-200/60 hidden sm:inline-block">
+                        Gayatama UNESA
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Browser Viewport Image Preview with Click to Zoom */}
+                  <div 
+                    onClick={() => setPreviewCert({
+                      src: '/projects/ablefy_landing.png',
+                      title: 'Ablefy — Universal Inclusivity & Accessibility Platform',
+                      subtitle: 'Platform Web Inklusif Multi-Modal Ramah Disabilitas (WCAG 2.1 Level AAA)'
+                    })}
+                    className="group relative cursor-pointer overflow-hidden bg-slate-950"
+                  >
+                    <img 
+                      src="/projects/ablefy_landing.png" 
+                      alt="Ablefy Web Platform Landing Preview" 
+                      className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-300 block" 
+                    />
+                    <div className="absolute inset-0 bg-neutral-900/0 group-hover:bg-neutral-900/10 transition-colors flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity px-4 py-2 rounded-full bg-white/95 text-neutral-900 text-xs font-bold shadow-md flex items-center gap-2">
+                        <ZoomIn className="w-3.5 h-3.5" /> Klik untuk Perbesar Layar HD
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Feature Metric Tiles */}
+                  <div className="p-4 sm:p-5 bg-white border-t border-neutral-100">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-left mb-3">
+                      <div className="p-3 rounded-xl bg-indigo-50/70 border border-indigo-100/80">
+                        <p className="text-[11px] text-neutral-500 font-medium">Standar Kepatuhan</p>
+                        <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">WCAG AAA</p>
+                        <p className="text-[10px] text-indigo-700 font-semibold mt-0.5">Level 2.1 Tertinggi</p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-100/80">
+                        <p className="text-[11px] text-neutral-500 font-medium">Kamus Isyarat</p>
+                        <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">99+ Kosakata</p>
+                        <p className="text-[10px] text-blue-700 font-semibold mt-0.5">BISINDO Interaktif</p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100/80">
+                        <p className="text-[11px] text-neutral-500 font-medium">Transkripsi Live</p>
+                        <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">0ms Latensi</p>
+                        <p className="text-[10px] text-emerald-700 font-semibold mt-0.5">Speech-to-Text Instan</p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-100/80">
+                        <p className="text-[11px] text-neutral-500 font-medium">Fitur Suara Alami</p>
+                        <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">Multi-Voice</p>
+                        <p className="text-[10px] text-purple-700 font-semibold mt-0.5">Gadis &amp; Ardi TTS</p>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap gap-2">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-50/60 text-indigo-950 text-xs font-semibold">
+                          <Check className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>OpenDyslexic &amp; Bionic Reading</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-50/60 text-indigo-950 text-xs font-semibold">
+                          <Check className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>Hands-Free Voice Navigation</span>
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => setPreviewCert({
+                          src: '/projects/ablefy_bisindo.png',
+                          title: 'Kamus & Papan Kalimat BISINDO — Ablefy',
+                          subtitle: 'Modul Pembelajaran dan Komunikasi Isyarat Dua Arah Ramah Teman Tuli'
+                        })}
+                        className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold underline underline-offset-2 flex items-center gap-1 cursor-pointer"
+                      >
+                        Lihat Modul BISINDO <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Signature Footer Card Bar */}
+              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3 sm:gap-3.5">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] p-2 flex items-center justify-center shadow-xs shrink-0 border border-neutral-100">
+                    <img src="/projects/ablefy_logo.svg" alt="Logo Ablefy" className="w-full h-full object-contain" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-neutral-900">Ablefy Platform</h4>
+                    <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
+                      ★★★★★ <span className="text-neutral-500 font-medium">Universal Inclusivity • Gayatama UNESA</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="hidden sm:flex items-center gap-6 sm:gap-8">
+                  <div>
+                    <p className="font-extrabold text-sm text-neutral-900">React 19 + Vite</p>
+                    <p className="text-xs text-neutral-500">TypeScript &amp; Tailwind</p>
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-sm text-neutral-900">Web Speech API</p>
+                    <p className="text-xs text-neutral-500">Audio &amp; Voice Synthesis</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 ml-auto sm:ml-0">
+                  <a 
+                    href="https://github.com/nazz-cmd/ablefy"
+                    target="_blank"
+                    rel="noopener noreferrer" 
+                    className="rounded-full border border-neutral-300 hover:border-neutral-900 text-neutral-800 px-4 py-2 sm:py-2.5 text-xs font-bold transition-all flex items-center gap-1.5"
+                  >
+                    <Code2 className="w-3.5 h-3.5" />
+                    <span>GitHub</span>
+                  </a>
+                  <a 
+                    href="https://ablefy.vercel.app" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-xs"
+                  >
+                    <span>Kunjungi Website</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            </article>
+
             {/* ELEVATION CARD 1: Manajemen Kelas 2026E */}
             <article id="card-portal" className="rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
               <div className="bg-[#f2f2f4] p-6 sm:p-10 md:p-14">
@@ -745,8 +907,8 @@ export default function JonnyCzarPortfolioPage() {
               {/* Signature Footer Card Bar */}
               <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3 sm:gap-3.5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-neutral-900 text-white flex items-center justify-center font-bold text-sm sm:text-base shadow-xs shrink-0">
-                    26E
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] p-2 flex items-center justify-center shadow-xs shrink-0 border border-neutral-100">
+                    <img src="/projects/portal_logo.svg" alt="Logo Kelas 2026E" className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-neutral-900">Manajemen Kelas 2026E</h4>
@@ -806,8 +968,8 @@ export default function JonnyCzarPortfolioPage() {
               {/* Signature Footer Card Bar */}
               <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3 sm:gap-3.5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm sm:text-base shadow-xs shrink-0">
-                    <CircleDollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden shadow-xs shrink-0 border border-neutral-100 bg-[#2c7be5] flex items-center justify-center">
+                    <img src="/projects/keuangan_logo.png" alt="Logo Aplikasi Keuangan" className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-neutral-900">Aplikasi Keuangan</h4>
@@ -862,8 +1024,8 @@ export default function JonnyCzarPortfolioPage() {
               {/* Signature Footer Card Bar */}
               <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3 sm:gap-3.5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm sm:text-base shadow-xs shrink-0">
-                    <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden shadow-xs shrink-0 bg-white border border-neutral-200/80 p-1.5 flex items-center justify-center">
+                    <img src="/projects/mylife_logo.png" alt="Logo MyLife Productivity" className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-neutral-900">MyLife Productivity</h4>
@@ -924,11 +1086,13 @@ export default function JonnyCzarPortfolioPage() {
                     <div className="flex items-center gap-3">
                       {/* Avatar with verified check */}
                       <div className="relative">
-                        <img 
-                          src="/projects/nazzgram_avatar.png" 
-                          alt="Logo NAZZGRAM" 
-                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover border-2 border-orange-400 shadow-xs"
-                        />
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white border-2 border-orange-400/90 shadow-xs flex items-center justify-center p-1.5 overflow-hidden">
+                          <img 
+                            src="/projects/nazzgram_logo.png" 
+                            alt="Logo NAZZGRAM" 
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
                         <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center" title="Aktif">
                           <span className="w-1.5 h-1.5 rounded-full bg-white" />
                         </span>
@@ -942,7 +1106,7 @@ export default function JonnyCzarPortfolioPage() {
                         </div>
                         <p className="text-xs text-neutral-500 mt-0.5 flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                          <span>Aktif 2 menit lalu • Bergabung 5 Tahun Lalu</span>
+                          <span>Aktif 2 menit lalu • Bergabung 5 Tahun</span>
                         </p>
                       </div>
                     </div>
@@ -1021,8 +1185,8 @@ export default function JonnyCzarPortfolioPage() {
               {/* Signature Footer Card Bar */}
               <div className="bg-white/95 px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 relative z-10">
                 <div className="flex items-center gap-3 sm:gap-3.5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#ee4d2d] text-white flex items-center justify-center font-bold text-sm sm:text-base shadow-xs shrink-0">
-                    <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white border border-neutral-200/80 p-1.5 flex items-center justify-center shadow-xs shrink-0">
+                    <img src="/projects/nazzgram_logo.png" alt="Logo NAZZGRAM" className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-neutral-900">NAZZGRAM Store</h4>
