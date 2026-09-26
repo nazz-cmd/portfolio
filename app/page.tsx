@@ -36,7 +36,9 @@ import {
   ZoomIn,
   Calendar,
   Clock,
-  ShieldCheck
+  ShieldCheck,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { 
   LinkedinIcon, 
@@ -257,6 +259,58 @@ export default function JonnyCzarPortfolioPage() {
   const targetIdRef = useRef<string | null>(null);
   const scrollEndDebounceTimer = useRef<NodeJS.Timeout | null>(null);
   const safetyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Mobile Horizontal Projects Carousel State & Handlers
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const cardsTrackRef = useRef<HTMLDivElement>(null);
+
+  const projectList = [
+    { id: 'card-ablefy', title: 'Ablefy Web Platform', short: 'Ablefy' },
+    { id: 'card-portal', title: 'Manajemen Kelas 2026E', short: 'Kelas 2026E' },
+    { id: 'card-keuangan', title: 'Aplikasi Keuangan', short: 'Keuangan' },
+    { id: 'card-mylife', title: 'MyLife Productivity', short: 'MyLife' },
+    { id: 'card-shopee', title: 'NAZZGRAM Digital Store', short: 'NAZZGRAM' },
+  ];
+
+  const scrollToCardIndex = (index: number) => {
+    if (!cardsTrackRef.current) return;
+    const container = cardsTrackRef.current;
+    const cardElements = container.children;
+    if (cardElements[index]) {
+      const targetCard = cardElements[index] as HTMLElement;
+      container.scrollTo({
+        left: targetCard.offsetLeft - container.offsetLeft,
+        behavior: 'smooth'
+      });
+      setActiveCardIndex(index);
+    }
+  };
+
+  const scrollCard = (direction: 'prev' | 'next') => {
+    const newIndex = direction === 'prev' ? Math.max(0, activeCardIndex - 1) : Math.min(projectList.length - 1, activeCardIndex + 1);
+    scrollToCardIndex(newIndex);
+  };
+
+  const handleCardsScroll = () => {
+    if (!cardsTrackRef.current) return;
+    const container = cardsTrackRef.current;
+    const scrollLeft = container.scrollLeft;
+    const cardElements = container.children;
+    if (cardElements.length === 0) return;
+
+    let closestIndex = 0;
+    let minDiff = Infinity;
+
+    for (let i = 0; i < cardElements.length; i++) {
+      const card = cardElements[i] as HTMLElement;
+      const diff = Math.abs(card.offsetLeft - container.offsetLeft - scrollLeft);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = i;
+      }
+    }
+    setActiveCardIndex(closestIndex);
+  };
 
   // Smooth Cinematic Morphing Effect (Reliable Infinite Repeat Loop)
   useEffect(() => {
@@ -717,170 +771,133 @@ export default function JonnyCzarPortfolioPage() {
 
           </aside>
 
-          {/* Right Column: Elevation Cards Stack */}
-          <div className="flex-1 space-y-12 sm:space-y-16 md:space-y-20 w-full min-w-0">
+          {/* Right Column: Elevation Cards (Horizontal Carousel on Mobile, Vertical Stack on Desktop) */}
+          <div className="flex-1 w-full min-w-0">
 
-            {/* ELEVATION CARD 0: Ablefy Platform */}
-            <article id="card-ablefy" className="rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
-              <div className="bg-[#f0f4ff] p-6 sm:p-10 md:p-14">
-                <div className="flex flex-wrap items-center gap-2 mb-2.5 sm:mb-3">
-                  <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-indigo-900 font-semibold">
+            {/* Mobile Carousel Navigation Header (Visible only on mobile/tablet < lg) */}
+            <div className="lg:hidden flex items-center justify-between mb-3 px-1">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full bg-neutral-900 text-white text-[11px] font-bold tracking-wide">
+                  {activeCardIndex + 1} / {projectList.length}
+                </span>
+                <span className="text-xs font-bold text-neutral-800 truncate max-w-[170px] sm:max-w-xs">
+                  {projectList[activeCardIndex].title}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => scrollCard('prev')}
+                  disabled={activeCardIndex === 0}
+                  className="w-8 h-8 rounded-full bg-white border border-neutral-200 shadow-2xs flex items-center justify-center text-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 transition-all cursor-pointer"
+                  aria-label="Proyek Sebelumnya"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollCard('next')}
+                  disabled={activeCardIndex === projectList.length - 1}
+                  className="w-8 h-8 rounded-full bg-white border border-neutral-200 shadow-2xs flex items-center justify-center text-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 transition-all cursor-pointer"
+                  aria-label="Proyek Selanjutnya"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Swipe Hint */}
+            <div className="lg:hidden flex items-center justify-center gap-1 text-[11px] text-neutral-400 font-medium mb-3">
+              <span>← Geser horizontal untuk melihat proyek lain →</span>
+            </div>
+
+            {/* Cards Track: Horizontal Swipe on Mobile (< lg), Vertical Stack on Desktop (lg+) */}
+            <div 
+              ref={cardsTrackRef}
+              onScroll={handleCardsScroll}
+              className="flex flex-row overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar gap-4 sm:gap-6 pb-6 pt-1 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 lg:flex-col lg:overflow-visible lg:snap-none lg:space-y-16 md:space-y-20 lg:gap-0 lg:pb-0"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+
+              {/* ELEVATION CARD 0: Ablefy Platform */}
+              <article id="card-ablefy" className="w-[86vw] sm:w-[480px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
+                <div className="bg-[#eef2ff] p-6 sm:p-10 md:p-14 flex-1 flex flex-col">
+                  <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-indigo-900 mb-2.5 sm:mb-3 font-semibold">
                     UNIVERSAL INCLUSIVITY &amp; ASSISTIVE TECH
                   </p>
-                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-[11px] font-bold">
-                    WCAG 2.1 AAA
-                  </span>
-                </div>
-                <h2 className="font-gt-america text-2xl sm:text-3xl md:text-[42px] lg:text-[46px] text-neutral-900 tracking-tight leading-[1.14] mb-4 sm:mb-5 font-bold">
-                  Ablefy Web Platform
-                </h2>
-                <p className="text-[15px] sm:text-[17px] text-[#555555] max-w-2xl leading-relaxed mb-8 sm:mb-10 font-normal">
-                  Platform web aksesibilitas multi-modal terpadu untuk penyandang disabilitas (Sahabat Netra, Teman Tuli, Disleksia, dan Keterbatasan Motorik) berstandar kepatuhan WCAG 2.1 Level AAA. Dilengkapi Text-to-Speech multi-karakter suara alami, transkripsi wicara real-time (Speech-to-Text), modul kamus &amp; papan interaktif bahasa isyarat BISINDO, tipografi ramah disleksia, serta navigasi suara bebas tangan.
-                </p>
+                  <h2 className="font-gt-america text-2xl sm:text-3xl md:text-[42px] lg:text-[46px] text-neutral-900 tracking-tight leading-[1.14] mb-4 sm:mb-5 font-bold">
+                    Ablefy Web Platform
+                  </h2>
+                  <p className="text-[15px] sm:text-[17px] text-[#555555] max-w-2xl leading-relaxed mb-8 sm:mb-10 font-normal">
+                    Platform web aksesibilitas multi-modal terpadu untuk penyandang disabilitas (Sahabat Netra, Teman Tuli, Disleksia, dan Keterbatasan Motorik) berstandar kepatuhan WCAG 2.1 Level AAA. Dilengkapi Text-to-Speech suara alami, transkripsi wicara real-time, modul kamus &amp; papan interaktif bahasa isyarat BISINDO, dan navigasi suara bebas tangan.
+                  </p>
 
-                {/* Desktop Web App Browser Showcase */}
-                <div className="max-w-3xl mx-auto rounded-2xl sm:rounded-3xl overflow-hidden border border-neutral-200/90 bg-white shadow-[0_20px_45px_rgba(0,0,0,0.08)]">
-                  {/* Browser Window Header */}
-                  <div className="bg-[#f8fafc] px-4 py-3 border-b border-neutral-200/80 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-[#ff5f56] inline-block" />
-                      <span className="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block" />
-                      <span className="w-3 h-3 rounded-full bg-[#27c93f] inline-block" />
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-neutral-200 text-xs text-neutral-600 font-mono shadow-2xs">
-                      <span className="text-emerald-600 font-bold">🔒</span>
-                      <span>ablefy.vercel.app</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-bold border border-indigo-200/60 hidden sm:inline-block">
-                        Gayatama UNESA
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Browser Viewport Image Preview with Click to Zoom */}
-                  <div 
-                    onClick={() => setPreviewCert({
-                      src: '/projects/ablefy_landing.png',
-                      title: 'Ablefy — Universal Inclusivity & Accessibility Platform',
-                      subtitle: 'Platform Web Inklusif Multi-Modal Ramah Disabilitas (WCAG 2.1 Level AAA)'
-                    })}
-                    className="group relative cursor-pointer overflow-hidden bg-slate-950"
-                  >
-                    <img 
-                      src="/projects/ablefy_landing.png" 
-                      alt="Ablefy Web Platform Landing Preview" 
-                      className="w-full h-auto object-cover group-hover:scale-[1.01] transition-transform duration-300 block" 
-                    />
-                    <div className="absolute inset-0 bg-neutral-900/0 group-hover:bg-neutral-900/10 transition-colors flex items-center justify-center">
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity px-4 py-2 rounded-full bg-white/95 text-neutral-900 text-xs font-bold shadow-md flex items-center gap-2">
-                        <ZoomIn className="w-3.5 h-3.5" /> Klik untuk Perbesar Layar HD
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Feature Metric Tiles */}
-                  <div className="p-4 sm:p-5 bg-white border-t border-neutral-100">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-left mb-3">
-                      <div className="p-3 rounded-xl bg-indigo-50/70 border border-indigo-100/80">
-                        <p className="text-[11px] text-neutral-500 font-medium">Standar Kepatuhan</p>
-                        <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">WCAG AAA</p>
-                        <p className="text-[10px] text-indigo-700 font-semibold mt-0.5">Level 2.1 Tertinggi</p>
-                      </div>
-                      <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-100/80">
-                        <p className="text-[11px] text-neutral-500 font-medium">Kamus Isyarat</p>
-                        <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">99+ Kosakata</p>
-                        <p className="text-[10px] text-blue-700 font-semibold mt-0.5">BISINDO Interaktif</p>
-                      </div>
-                      <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100/80">
-                        <p className="text-[11px] text-neutral-500 font-medium">Transkripsi Live</p>
-                        <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">0ms Latensi</p>
-                        <p className="text-[10px] text-emerald-700 font-semibold mt-0.5">Speech-to-Text Instan</p>
-                      </div>
-                      <div className="p-3 rounded-xl bg-purple-50/70 border border-purple-100/80">
-                        <p className="text-[11px] text-neutral-500 font-medium">Fitur Suara Alami</p>
-                        <p className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5">Multi-Voice</p>
-                        <p className="text-[10px] text-purple-700 font-semibold mt-0.5">Gadis &amp; Ardi TTS</p>
-                      </div>
-                    </div>
-
-                    <div className="pt-3 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex flex-wrap gap-2">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-50/60 text-indigo-950 text-xs font-semibold">
-                          <Check className="w-3.5 h-3.5 text-indigo-600" />
-                          <span>OpenDyslexic &amp; Bionic Reading</span>
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-50/60 text-indigo-950 text-xs font-semibold">
-                          <Check className="w-3.5 h-3.5 text-indigo-600" />
-                          <span>Hands-Free Voice Navigation</span>
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => setPreviewCert({
-                          src: '/projects/ablefy_bisindo.png',
-                          title: 'Kamus & Papan Kalimat BISINDO — Ablefy',
-                          subtitle: 'Modul Pembelajaran dan Komunikasi Isyarat Dua Arah Ramah Teman Tuli'
-                        })}
-                        className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold underline underline-offset-2 flex items-center gap-1 cursor-pointer"
-                      >
-                        Lihat Modul BISINDO <ArrowRight className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Signature Footer Card Bar */}
-              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-3 sm:gap-3.5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] p-2 flex items-center justify-center shadow-xs shrink-0 border border-neutral-100">
-                    <img src="/projects/ablefy_logo.svg" alt="Logo Ablefy" className="w-full h-full object-contain" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-neutral-900">Ablefy Platform</h4>
-                    <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
-                      ★★★★★ <span className="text-neutral-500 font-medium">Universal Inclusivity • Gayatama UNESA</span>
+                  {/* Real Mobile Mockup Frame (Identical to other app cards) */}
+                  <div className="flex items-center justify-center py-2 max-w-md mx-auto">
+                    <div 
+                      onClick={() => setPreviewCert({
+                        src: '/projects/ablefy_mobile.png',
+                        title: 'Ablefy — Universal Inclusivity & Accessibility Platform',
+                        subtitle: 'Platform Web Inklusif Multi-Modal Ramah Disabilitas (WCAG 2.1 Level AAA)'
+                      })}
+                      className="w-[195px] sm:w-[230px] rounded-[26px] sm:rounded-[30px] overflow-hidden border-[3.5px] border-neutral-900 bg-white shadow-[0_20px_45px_rgba(0,0,0,0.13)] cursor-pointer group hover:scale-[1.02] transition-transform duration-300"
+                    >
+                      <img src="/projects/ablefy_mobile.png" alt="Ablefy Web Platform" className="w-full h-auto object-cover block" />
                     </div>
                   </div>
                 </div>
 
-                <div className="hidden sm:flex items-center gap-6 sm:gap-8">
-                  <div>
-                    <p className="font-extrabold text-sm text-neutral-900">React 19 + Vite</p>
-                    <p className="text-xs text-neutral-500">TypeScript &amp; Tailwind</p>
+                {/* Signature Footer Card Bar */}
+                <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 mt-auto">
+                  <div className="flex items-center gap-3 sm:gap-3.5">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] p-2 flex items-center justify-center shadow-xs shrink-0 border border-neutral-100">
+                      <img src="/projects/ablefy_logo.svg" alt="Logo Ablefy" className="w-full h-full object-contain" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-sm text-neutral-900">Ablefy Platform</h4>
+                      <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
+                        ★★★★★ <span className="text-neutral-500 font-medium">Universal Inclusivity • Gayatama UNESA</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-extrabold text-sm text-neutral-900">Web Speech API</p>
-                    <p className="text-xs text-neutral-500">Audio &amp; Voice Synthesis</p>
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-2.5 ml-auto sm:ml-0">
-                  <a 
-                    href="https://github.com/nazz-cmd/ablefy"
-                    target="_blank"
-                    rel="noopener noreferrer" 
-                    className="rounded-full border border-neutral-300 hover:border-neutral-900 text-neutral-800 px-4 py-2 sm:py-2.5 text-xs font-bold transition-all flex items-center gap-1.5"
-                  >
-                    <Code2 className="w-3.5 h-3.5" />
-                    <span>GitHub</span>
-                  </a>
-                  <a 
-                    href="https://ablefy.vercel.app" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-xs"
-                  >
-                    <span>Kunjungi Website</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
+                  <div className="hidden sm:flex items-center gap-6 sm:gap-8">
+                    <div>
+                      <p className="font-extrabold text-sm text-neutral-900">React 19 + Vite</p>
+                      <p className="text-xs text-neutral-500">TypeScript &amp; Tailwind</p>
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-sm text-neutral-900">WCAG 2.1 AAA</p>
+                      <p className="text-xs text-neutral-500">Speech &amp; Audio Synthesis</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 ml-auto sm:ml-0">
+                    <a 
+                      href="https://github.com/nazz-cmd/ablefy"
+                      target="_blank"
+                      rel="noopener noreferrer" 
+                      className="rounded-full border border-neutral-300 hover:border-neutral-900 text-neutral-800 px-4 py-2 sm:py-2.5 text-xs font-bold transition-all flex items-center gap-1.5"
+                    >
+                      <Code2 className="w-3.5 h-3.5" />
+                      <span>GitHub</span>
+                    </a>
+                    <a 
+                      href="https://ablefy.vercel.app" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-xs"
+                    >
+                      <span>Kunjungi Website</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </article>
+              </article>
 
             {/* ELEVATION CARD 1: Manajemen Kelas 2026E */}
-            <article id="card-portal" className="rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
-              <div className="bg-[#f2f2f4] p-6 sm:p-10 md:p-14">
+            <article id="card-portal" className="w-[86vw] sm:w-[480px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
+              <div className="bg-[#f2f2f4] p-6 sm:p-10 md:p-14 flex-1 flex flex-col">
                 <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-neutral-500 mb-2.5 sm:mb-3 font-semibold">
                   CAMPUS WORKFLOWS &amp; COMMUNITY
                 </p>
@@ -905,7 +922,7 @@ export default function JonnyCzarPortfolioPage() {
               </div>
 
               {/* Signature Footer Card Bar */}
-              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4">
+              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 mt-auto">
                 <div className="flex items-center gap-3 sm:gap-3.5">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] p-2 flex items-center justify-center shadow-xs shrink-0 border border-neutral-100">
                     <img src="/projects/portal_logo.svg" alt="Logo Kelas 2026E" className="w-full h-full object-contain" />
@@ -940,8 +957,8 @@ export default function JonnyCzarPortfolioPage() {
             </article>
 
             {/* ELEVATION CARD 2: Aplikasi Keuangan */}
-            <article id="card-keuangan" className="rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
-              <div className="bg-[#edf3fa] p-6 sm:p-10 md:p-14">
+            <article id="card-keuangan" className="w-[86vw] sm:w-[480px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
+              <div className="bg-[#edf3fa] p-6 sm:p-10 md:p-14 flex-1 flex flex-col">
                 <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-blue-900 mb-2.5 sm:mb-3 font-semibold">
                   FINANCIAL TECHNOLOGY
                 </p>
@@ -966,7 +983,7 @@ export default function JonnyCzarPortfolioPage() {
               </div>
 
               {/* Signature Footer Card Bar */}
-              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4">
+              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 mt-auto">
                 <div className="flex items-center gap-3 sm:gap-3.5">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden shadow-xs shrink-0 border border-neutral-100 bg-[#2c7be5] flex items-center justify-center">
                     <img src="/projects/keuangan_logo.png" alt="Logo Aplikasi Keuangan" className="w-full h-full object-cover" />
@@ -1001,8 +1018,8 @@ export default function JonnyCzarPortfolioPage() {
             </article>
 
             {/* ELEVATION CARD 3: Aplikasi MyLife Productivity */}
-            <article id="card-mylife" className="rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
-              <div className="bg-[#eef8f2] p-6 sm:p-10 md:p-14">
+            <article id="card-mylife" className="w-[86vw] sm:w-[480px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
+              <div className="bg-[#eef8f2] p-6 sm:p-10 md:p-14 flex-1 flex flex-col">
                 <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-emerald-900 mb-2.5 sm:mb-3 font-semibold">
                   PRODUCTIVITY &amp; DEEP WORK
                 </p>
@@ -1022,7 +1039,7 @@ export default function JonnyCzarPortfolioPage() {
               </div>
 
               {/* Signature Footer Card Bar */}
-              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4">
+              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 mt-auto">
                 <div className="flex items-center gap-3 sm:gap-3.5">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden shadow-xs shrink-0 bg-white border border-neutral-200/80 p-1.5 flex items-center justify-center">
                     <img src="/projects/mylife_logo.png" alt="Logo MyLife Productivity" className="w-full h-full object-contain" />
@@ -1057,11 +1074,11 @@ export default function JonnyCzarPortfolioPage() {
             </article>
 
             {/* ELEVATION CARD 4: NAZZGRAM Official Store */}
-            <article id="card-shopee" className="relative rounded-[28px] sm:rounded-[36px] overflow-hidden border border-orange-100 shadow-[0_15px_40px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_55px_rgba(0,0,0,0.09)] transition-all duration-300 bg-gradient-to-br from-[#ffffff] via-[#fff7ed] to-[#fed7aa]/35">
+            <article id="card-shopee" className="relative w-[86vw] sm:w-[480px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[28px] sm:rounded-[36px] overflow-hidden border border-orange-100 shadow-[0_15px_40px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_55px_rgba(0,0,0,0.09)] transition-all duration-300 bg-gradient-to-br from-[#ffffff] via-[#fff7ed] to-[#fed7aa]/35">
               {/* Vibrant Ambient Glow */}
               <div className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 bg-orange-500/12 rounded-full blur-3xl" />
 
-              <div className="p-6 sm:p-10 md:p-12 relative z-10">
+              <div className="p-6 sm:p-10 md:p-12 relative z-10 flex-1 flex flex-col">
                 <div className="flex flex-wrap items-center gap-2 mb-2.5 sm:mb-3">
                   <span className="font-gt-america text-[13px] sm:text-[15px] uppercase tracking-wider text-[#ee4d2d] font-bold">
                     DIGITAL COMMERCE • 5+ TAHUN
@@ -1183,7 +1200,7 @@ export default function JonnyCzarPortfolioPage() {
               </div>
 
               {/* Signature Footer Card Bar */}
-              <div className="bg-white/95 px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 relative z-10">
+              <div className="bg-white/95 px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 relative z-10 mt-auto">
                 <div className="flex items-center gap-3 sm:gap-3.5">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white border border-neutral-200/80 p-1.5 flex items-center justify-center shadow-xs shrink-0">
                     <img src="/projects/nazzgram_logo.png" alt="Logo NAZZGRAM" className="w-full h-full object-contain" />
@@ -1209,8 +1226,8 @@ export default function JonnyCzarPortfolioPage() {
 
                 <a 
                   href="https://shopee.co.id/nazzgram" 
-                  target="_blank"
-                  rel="noreferrer"
+                  target="_blank" 
+                  rel="noreferrer" 
                   className="rounded-full bg-[#ee4d2d] hover:bg-[#d03b1b] text-white px-5 sm:px-7 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shrink-0 ml-auto sm:ml-0 shadow-xs"
                 >
                   <span>Kunjungi Toko Shopee</span>
@@ -1218,6 +1235,23 @@ export default function JonnyCzarPortfolioPage() {
                 </a>
               </div>
             </article>
+
+            </div>
+
+            {/* Mobile Pagination Dots Indicator */}
+            <div className="lg:hidden flex items-center justify-center gap-1.5 mt-2 pb-2">
+              {projectList.map((project, idx) => (
+                <button
+                  key={project.id}
+                  type="button"
+                  onClick={() => scrollToCardIndex(idx)}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    activeCardIndex === idx ? 'w-7 bg-neutral-900' : 'w-2 bg-neutral-300 hover:bg-neutral-400'
+                  }`}
+                  aria-label={`Lihat ${project.title}`}
+                />
+              ))}
+            </div>
 
           </div>
         </div>
