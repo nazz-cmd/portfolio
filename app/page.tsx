@@ -263,14 +263,24 @@ export default function JonnyCzarPortfolioPage() {
   // Mobile Horizontal Projects Carousel State & Handlers
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const cardsTrackRef = useRef<HTMLDivElement>(null);
+  const [isAutoPlayPaused, setIsAutoPlayPaused] = useState(false);
+  const autoPlayPauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const projectList = [
-    { id: 'card-ablefy', title: 'Ablefy Web Platform', short: 'Ablefy' },
-    { id: 'card-portal', title: 'Manajemen Kelas 2026E', short: 'Kelas 2026E' },
-    { id: 'card-keuangan', title: 'Aplikasi Keuangan', short: 'Keuangan' },
-    { id: 'card-mylife', title: 'MyLife Productivity', short: 'MyLife' },
-    { id: 'card-shopee', title: 'NAZZGRAM Digital Store', short: 'NAZZGRAM' },
+    { id: 'card-ablefy', title: 'Ablefy Web Platform', short: 'Ablefy', color: 'from-indigo-600 to-blue-600', badgeBg: 'bg-indigo-100 text-indigo-800' },
+    { id: 'card-portal', title: 'Manajemen Kelas 2026E', short: 'Kelas 2026E', color: 'from-slate-700 to-blue-800', badgeBg: 'bg-blue-100 text-blue-900' },
+    { id: 'card-keuangan', title: 'Aplikasi Keuangan', short: 'Keuangan', color: 'from-blue-600 to-cyan-600', badgeBg: 'bg-sky-100 text-sky-900' },
+    { id: 'card-mylife', title: 'MyLife Productivity', short: 'MyLife', color: 'from-emerald-600 to-teal-700', badgeBg: 'bg-emerald-100 text-emerald-900' },
+    { id: 'card-shopee', title: 'NAZZGRAM Store', short: 'NAZZGRAM', color: 'from-[#ee4d2d] to-amber-600', badgeBg: 'bg-orange-100 text-[#ee4d2d]' },
   ];
+
+  const pauseAutoPlayTemporarily = (duration = 6500) => {
+    setIsAutoPlayPaused(true);
+    if (autoPlayPauseTimeoutRef.current) clearTimeout(autoPlayPauseTimeoutRef.current);
+    autoPlayPauseTimeoutRef.current = setTimeout(() => {
+      setIsAutoPlayPaused(false);
+    }, duration);
+  };
 
   const scrollToCardIndex = (index: number) => {
     if (!cardsTrackRef.current) return;
@@ -278,8 +288,9 @@ export default function JonnyCzarPortfolioPage() {
     const cardElements = container.children;
     if (cardElements[index]) {
       const targetCard = cardElements[index] as HTMLElement;
+      const scrollPos = targetCard.offsetLeft - container.offsetLeft - (container.clientWidth - targetCard.clientWidth) / 2;
       container.scrollTo({
-        left: targetCard.offsetLeft - container.offsetLeft,
+        left: Math.max(0, scrollPos),
         behavior: 'smooth'
       });
       setActiveCardIndex(index);
@@ -287,7 +298,10 @@ export default function JonnyCzarPortfolioPage() {
   };
 
   const scrollCard = (direction: 'prev' | 'next') => {
-    const newIndex = direction === 'prev' ? Math.max(0, activeCardIndex - 1) : Math.min(projectList.length - 1, activeCardIndex + 1);
+    pauseAutoPlayTemporarily(7500);
+    const newIndex = direction === 'prev' 
+      ? Math.max(0, activeCardIndex - 1) 
+      : Math.min(projectList.length - 1, activeCardIndex + 1);
     scrollToCardIndex(newIndex);
   };
 
@@ -303,7 +317,9 @@ export default function JonnyCzarPortfolioPage() {
 
     for (let i = 0; i < cardElements.length; i++) {
       const card = cardElements[i] as HTMLElement;
-      const diff = Math.abs(card.offsetLeft - container.offsetLeft - scrollLeft);
+      const cardCenter = card.offsetLeft - container.offsetLeft + card.clientWidth / 2;
+      const viewCenter = scrollLeft + container.clientWidth / 2;
+      const diff = Math.abs(cardCenter - viewCenter);
       if (diff < minDiff) {
         minDiff = diff;
         closestIndex = i;
@@ -311,6 +327,23 @@ export default function JonnyCzarPortfolioPage() {
     }
     setActiveCardIndex(closestIndex);
   };
+
+  // Moderate Pace Auto-Slide (Bergeser otomatis dengan tempo santai & halus ~ 4.8 detik)
+  useEffect(() => {
+    if (isAutoPlayPaused) return;
+
+    const autoSlideTimer = setInterval(() => {
+      if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+        setActiveCardIndex((prev) => {
+          const nextIndex = (prev + 1) % projectList.length;
+          scrollToCardIndex(nextIndex);
+          return nextIndex;
+        });
+      }
+    }, 4800);
+
+    return () => clearInterval(autoSlideTimer);
+  }, [isAutoPlayPaused, projectList.length]);
 
   // Smooth Cinematic Morphing Effect (Reliable Infinite Repeat Loop)
   useEffect(() => {
@@ -775,72 +808,83 @@ export default function JonnyCzarPortfolioPage() {
           <div className="flex-1 w-full min-w-0">
 
             {/* Mobile Carousel Navigation Header (Visible only on mobile/tablet < lg) */}
-            <div className="lg:hidden flex items-center justify-between mb-3 px-1">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-full bg-neutral-900 text-white text-[11px] font-bold tracking-wide">
+            <div className="lg:hidden flex items-center justify-between mb-2 px-1">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-white text-[11px] font-bold tracking-wide shadow-xs bg-gradient-to-r ${projectList[activeCardIndex].color} transition-all duration-300`}>
                   {activeCardIndex + 1} / {projectList.length}
                 </span>
                 <span className="text-xs font-bold text-neutral-800 truncate max-w-[170px] sm:max-w-xs">
                   {projectList[activeCardIndex].title}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   type="button"
                   onClick={() => scrollCard('prev')}
                   disabled={activeCardIndex === 0}
-                  className="w-8 h-8 rounded-full bg-white border border-neutral-200 shadow-2xs flex items-center justify-center text-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 transition-all cursor-pointer"
+                  className="w-7 h-7 rounded-full bg-white border border-neutral-200 shadow-2xs flex items-center justify-center text-neutral-700 disabled:opacity-25 disabled:cursor-not-allowed active:scale-90 transition-all cursor-pointer"
                   aria-label="Proyek Sebelumnya"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
                 <button
                   type="button"
                   onClick={() => scrollCard('next')}
                   disabled={activeCardIndex === projectList.length - 1}
-                  className="w-8 h-8 rounded-full bg-white border border-neutral-200 shadow-2xs flex items-center justify-center text-neutral-700 disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 transition-all cursor-pointer"
+                  className="w-7 h-7 rounded-full bg-white border border-neutral-200 shadow-2xs flex items-center justify-center text-neutral-700 disabled:opacity-25 disabled:cursor-not-allowed active:scale-90 transition-all cursor-pointer"
                   aria-label="Proyek Selanjutnya"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
-            {/* Mobile Swipe Hint */}
-            <div className="lg:hidden flex items-center justify-center gap-1 text-[11px] text-neutral-400 font-medium mb-3">
-              <span>← Geser horizontal untuk melihat proyek lain →</span>
+            {/* Mobile Auto-slide & Swipe Hint */}
+            <div className="lg:hidden flex items-center justify-between text-[11px] text-neutral-400 font-medium mb-3 px-1">
+              <span className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${isAutoPlayPaused ? 'bg-amber-400' : 'bg-emerald-500 animate-pulse'}`} />
+                <span>{isAutoPlayPaused ? 'Dijeda (sentuh)' : 'Otomatis bergeser'}</span>
+              </span>
+              <span className="text-neutral-400 text-[10.5px]">← Geser horizontal →</span>
             </div>
 
             {/* Cards Track: Horizontal Swipe on Mobile (< lg), Vertical Stack on Desktop (lg+) */}
             <div 
               ref={cardsTrackRef}
               onScroll={handleCardsScroll}
-              className="flex flex-row overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar gap-4 sm:gap-6 pb-6 pt-1 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 lg:flex-col lg:overflow-visible lg:snap-none lg:space-y-16 md:space-y-20 lg:gap-0 lg:pb-0"
+              onTouchStart={() => pauseAutoPlayTemporarily(7000)}
+              onMouseEnter={() => setIsAutoPlayPaused(true)}
+              onMouseLeave={() => setIsAutoPlayPaused(false)}
+              className="flex flex-row overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar gap-3.5 sm:gap-5 pb-5 pt-1 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 lg:flex-col lg:overflow-visible lg:snap-none lg:space-y-16 md:space-y-20 lg:gap-0 lg:pb-0"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
 
               {/* ELEVATION CARD 0: Ablefy Platform */}
-              <article id="card-ablefy" className="w-[86vw] sm:w-[480px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
-                <div className="bg-[#eef2ff] p-6 sm:p-10 md:p-14 flex-1 flex flex-col">
-                  <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-indigo-900 mb-2.5 sm:mb-3 font-semibold">
-                    UNIVERSAL INCLUSIVITY &amp; ASSISTIVE TECH
-                  </p>
-                  <h2 className="font-gt-america text-2xl sm:text-3xl md:text-[42px] lg:text-[46px] text-neutral-900 tracking-tight leading-[1.14] mb-4 sm:mb-5 font-bold">
+              <article id="card-ablefy" className="relative w-[82vw] sm:w-[420px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[24px] sm:rounded-[32px] overflow-hidden border border-indigo-100 shadow-[0_12px_36px_rgba(99,102,241,0.08)] hover:shadow-[0_22px_50px_rgba(99,102,241,0.18)] transition-all duration-300 bg-gradient-to-br from-[#f8faff] via-[#eef3ff] to-[#e0e7ff]/70">
+                {/* Ambient Vibrant Glow Orb */}
+                <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl" />
+
+                <div className="p-4 sm:p-7 md:p-10 lg:p-12 flex-1 flex flex-col relative z-10">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-100/90 border border-indigo-200/80 text-indigo-900 text-[10.5px] sm:text-[11.5px] font-bold tracking-wide uppercase mb-2 self-start shadow-2xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
+                    <span>Inclusivity &amp; Assistive Tech</span>
+                  </div>
+                  <h2 className="font-gt-america text-xl sm:text-2xl md:text-3xl lg:text-[40px] text-neutral-900 tracking-tight leading-[1.18] mb-1.5 sm:mb-2 font-bold">
                     Ablefy Web Platform
                   </h2>
-                  <p className="text-[15px] sm:text-[17px] text-[#555555] max-w-2xl leading-relaxed mb-8 sm:mb-10 font-normal">
-                    Platform web aksesibilitas multi-modal terpadu untuk penyandang disabilitas (Sahabat Netra, Teman Tuli, Disleksia, dan Keterbatasan Motorik) berstandar kepatuhan WCAG 2.1 Level AAA. Dilengkapi Text-to-Speech suara alami, transkripsi wicara real-time, modul kamus &amp; papan interaktif bahasa isyarat BISINDO, dan navigasi suara bebas tangan.
+                  <p className="text-[12.5px] sm:text-[14px] md:text-[15.5px] text-neutral-600 max-w-xl leading-relaxed mb-3.5 sm:mb-5 font-normal">
+                    Platform web inklusif ramah disabilitas (WCAG 2.1 AAA) dengan Text-to-Speech alami, transkripsi real-time, dan kamus isyarat interaktif BISINDO.
                   </p>
 
-                  {/* Real Mobile Mockup Frame (Identical to other app cards) */}
-                  <div className="flex items-center justify-center py-2 max-w-md mx-auto">
+                  {/* Real Mobile Mockup Frame */}
+                  <div className="flex items-center justify-center py-1 max-w-xs mx-auto">
                     <div 
                       onClick={() => setPreviewCert({
                         src: '/projects/ablefy_mobile.png',
                         title: 'Ablefy — Universal Inclusivity & Accessibility Platform',
                         subtitle: 'Platform Web Inklusif Multi-Modal Ramah Disabilitas (WCAG 2.1 Level AAA)'
                       })}
-                      className="w-[195px] sm:w-[230px] rounded-[26px] sm:rounded-[30px] overflow-hidden border-[3.5px] border-neutral-900 bg-white shadow-[0_20px_45px_rgba(0,0,0,0.13)] cursor-pointer group hover:scale-[1.02] transition-transform duration-300"
+                      className="w-[140px] sm:w-[170px] md:w-[210px] rounded-[22px] sm:rounded-[28px] overflow-hidden border-[3px] border-neutral-900 bg-white shadow-[0_16px_36px_rgba(79,70,229,0.18)] cursor-pointer group hover:scale-[1.03] transition-all duration-300"
                     >
                       <img src="/projects/ablefy_mobile.png" alt="Ablefy Web Platform" className="w-full h-auto object-cover block" />
                     </div>
@@ -848,36 +892,36 @@ export default function JonnyCzarPortfolioPage() {
                 </div>
 
                 {/* Signature Footer Card Bar */}
-                <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 mt-auto">
-                  <div className="flex items-center gap-3 sm:gap-3.5">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] p-2 flex items-center justify-center shadow-xs shrink-0 border border-neutral-100">
+                <div className="bg-white/95 px-4 sm:px-7 py-3 sm:py-4 border-t border-indigo-100 flex flex-wrap items-center justify-between gap-3 relative z-10 mt-auto">
+                  <div className="flex items-center gap-2.5 sm:gap-3">
+                    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-[#0f172a] p-1.5 sm:p-2 flex items-center justify-center shadow-xs shrink-0 border border-neutral-100">
                       <img src="/projects/ablefy_logo.svg" alt="Logo Ablefy" className="w-full h-full object-contain" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-neutral-900">Ablefy Platform</h4>
-                      <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
-                        ★★★★★ <span className="text-neutral-500 font-medium">Universal Inclusivity • Gayatama UNESA</span>
+                      <h4 className="font-bold text-xs sm:text-sm text-neutral-900">Ablefy Platform</h4>
+                      <div className="flex items-center gap-1 text-[11px] sm:text-xs text-amber-500 font-bold">
+                        ★★★★★ <span className="text-neutral-500 font-medium">Universal Inclusivity</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="hidden sm:flex items-center gap-6 sm:gap-8">
                     <div>
-                      <p className="font-extrabold text-sm text-neutral-900">React 19 + Vite</p>
-                      <p className="text-xs text-neutral-500">TypeScript &amp; Tailwind</p>
+                      <p className="font-extrabold text-xs sm:text-sm text-neutral-900">React 19 + Vite</p>
+                      <p className="text-[11px] text-neutral-500">TypeScript &amp; Tailwind</p>
                     </div>
                     <div>
-                      <p className="font-extrabold text-sm text-neutral-900">WCAG 2.1 AAA</p>
-                      <p className="text-xs text-neutral-500">Speech &amp; Audio Synthesis</p>
+                      <p className="font-extrabold text-xs sm:text-sm text-neutral-900">WCAG 2.1 AAA</p>
+                      <p className="text-[11px] text-neutral-500">Speech &amp; Synthesis</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2.5 ml-auto sm:ml-0">
+                  <div className="flex items-center gap-2 ml-auto sm:ml-0">
                     <a 
                       href="https://github.com/nazz-cmd/ablefy"
                       target="_blank"
                       rel="noopener noreferrer" 
-                      className="rounded-full border border-neutral-300 hover:border-neutral-900 text-neutral-800 px-4 py-2 sm:py-2.5 text-xs font-bold transition-all flex items-center gap-1.5"
+                      className="rounded-full border border-neutral-300 hover:border-neutral-900 text-neutral-800 px-3 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5"
                     >
                       <Code2 className="w-3.5 h-3.5" />
                       <span>GitHub</span>
@@ -886,50 +930,54 @@ export default function JonnyCzarPortfolioPage() {
                       href="https://ablefy.vercel.app" 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white px-5 sm:px-6 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-xs"
+                      className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 sm:px-5 sm:py-2.5 text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
                     >
-                      <span>Kunjungi Website</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Kunjungi</span>
+                      <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
                 </div>
               </article>
 
             {/* ELEVATION CARD 1: Manajemen Kelas 2026E */}
-            <article id="card-portal" className="w-[86vw] sm:w-[480px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
-              <div className="bg-[#f2f2f4] p-6 sm:p-10 md:p-14 flex-1 flex flex-col">
-                <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-neutral-500 mb-2.5 sm:mb-3 font-semibold">
-                  CAMPUS WORKFLOWS &amp; COMMUNITY
-                </p>
-                <h2 className="font-gt-america text-2xl sm:text-3xl md:text-[42px] lg:text-[46px] text-neutral-900 tracking-tight leading-[1.14] mb-4 sm:mb-5 font-bold">
+            <article id="card-portal" className="relative w-[82vw] sm:w-[420px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[24px] sm:rounded-[32px] overflow-hidden border border-blue-100 shadow-[0_12px_36px_rgba(30,58,138,0.07)] hover:shadow-[0_22px_50px_rgba(30,58,138,0.16)] transition-all duration-300 bg-gradient-to-br from-[#f8fafc] via-[#f0f4f9] to-[#e2e8f0]/80">
+              {/* Ambient Vibrant Glow Orb */}
+              <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 bg-blue-500/12 rounded-full blur-3xl" />
+
+              <div className="p-4 sm:p-7 md:p-10 lg:p-12 flex-1 flex flex-col relative z-10">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100/90 border border-blue-200/80 text-blue-900 text-[10.5px] sm:text-[11.5px] font-bold tracking-wide uppercase mb-2 self-start shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                  <span>Campus Workflows &amp; Community</span>
+                </div>
+                <h2 className="font-gt-america text-xl sm:text-2xl md:text-3xl lg:text-[40px] text-neutral-900 tracking-tight leading-[1.18] mb-1.5 sm:mb-2 font-bold">
                   Manajemen Kelas 2026E
                 </h2>
-                <p className="text-[15px] sm:text-[17px] text-[#555555] max-w-2xl leading-relaxed mb-8 sm:mb-10 font-normal">
-                  Sistem informasi terpadu dan Instagram kelas untuk mengoordinasikan jadwal perkuliahan real-time, tugas harian, serta bank materi perkuliahan bagi 38 mahasiswa aktif S1 Bisnis Digital UNESA.
+                <p className="text-[12.5px] sm:text-[14px] md:text-[15.5px] text-neutral-600 max-w-xl leading-relaxed mb-3.5 sm:mb-5 font-normal">
+                  Sistem informasi terpadu jadwal kuliah real-time, bank modul &amp; materi, serta koordinasi harian 38 mahasiswa S1 Bisnis Digital UNESA.
                 </p>
 
                 {/* Real Mobile Mockups Frame */}
-                <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-4 sm:gap-7 py-2 max-w-2xl mx-auto">
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 sm:gap-5 py-1 max-w-md mx-auto">
                   {/* Phone 1: Jadwal Kuliah */}
-                  <div className="w-[185px] sm:w-[215px] rounded-[26px] sm:rounded-[30px] overflow-hidden border-[3.5px] border-neutral-900 bg-white shadow-[0_20px_45px_rgba(0,0,0,0.13)] shrink-0">
+                  <div className="w-[135px] sm:w-[165px] md:w-[200px] rounded-[22px] sm:rounded-[28px] overflow-hidden border-[3px] border-neutral-900 bg-white shadow-[0_16px_36px_rgba(15,23,42,0.14)] shrink-0">
                     <img src="/projects/portal_jadwal.png" alt="Jadwal Kuliah Kelas 2026E" className="w-full h-auto object-cover block" />
                   </div>
                   {/* Phone 2: Bank Materi */}
-                  <div className="w-[185px] sm:w-[215px] rounded-[26px] sm:rounded-[30px] overflow-hidden border-[3.5px] border-neutral-900 bg-white shadow-[0_20px_45px_rgba(0,0,0,0.13)] shrink-0 hidden xs:block">
+                  <div className="w-[135px] sm:w-[165px] md:w-[200px] rounded-[22px] sm:rounded-[28px] overflow-hidden border-[3px] border-neutral-900 bg-white shadow-[0_16px_36px_rgba(15,23,42,0.14)] shrink-0 hidden xs:block">
                     <img src="/projects/portal_materi.png" alt="Bank Materi &amp; Modul Kelas 2026E" className="w-full h-auto object-cover block" />
                   </div>
                 </div>
               </div>
 
               {/* Signature Footer Card Bar */}
-              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 mt-auto">
-                <div className="flex items-center gap-3 sm:gap-3.5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0f172a] p-2 flex items-center justify-center shadow-xs shrink-0 border border-neutral-100">
+              <div className="bg-white/95 px-4 sm:px-7 py-3 sm:py-4 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-3 relative z-10 mt-auto">
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-[#0f172a] p-1.5 sm:p-2 flex items-center justify-center shadow-xs shrink-0 border border-neutral-100">
                     <img src="/projects/portal_logo.svg" alt="Logo Kelas 2026E" className="w-full h-full object-contain" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-neutral-900">Manajemen Kelas 2026E</h4>
-                    <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
+                    <h4 className="font-bold text-xs sm:text-sm text-neutral-900">Manajemen Kelas 2026E</h4>
+                    <div className="flex items-center gap-1 text-[11px] sm:text-xs text-amber-500 font-bold">
                       ★★★★★ <span className="text-neutral-500 font-medium">5.0 UNESA</span>
                     </div>
                   </div>
@@ -937,18 +985,18 @@ export default function JonnyCzarPortfolioPage() {
 
                 <div className="hidden sm:flex items-center gap-6 sm:gap-8">
                   <div>
-                    <p className="font-extrabold text-sm text-neutral-900">38 Daily</p>
-                    <p className="text-xs text-neutral-500">Active Students</p>
+                    <p className="font-extrabold text-xs sm:text-sm text-neutral-900">38 Daily</p>
+                    <p className="text-[11px] text-neutral-500">Active Students</p>
                   </div>
                   <div>
-                    <p className="font-extrabold text-sm text-neutral-900">100%</p>
-                    <p className="text-xs text-neutral-500">On-Time Sync</p>
+                    <p className="font-extrabold text-xs sm:text-sm text-neutral-900">100%</p>
+                    <p className="text-[11px] text-neutral-500">On-Time Sync</p>
                   </div>
                 </div>
 
                 <a 
                   href="/portal" 
-                  className="rounded-full bg-black hover:bg-neutral-800 text-white px-5 sm:px-7 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shrink-0 ml-auto sm:ml-0"
+                  className="rounded-full bg-black hover:bg-neutral-800 text-white px-3.5 py-1.5 sm:px-6 sm:py-2.5 text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ml-auto sm:ml-0 shadow-xs"
                 >
                   <span>Explore Portal</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -957,40 +1005,44 @@ export default function JonnyCzarPortfolioPage() {
             </article>
 
             {/* ELEVATION CARD 2: Aplikasi Keuangan */}
-            <article id="card-keuangan" className="w-[86vw] sm:w-[480px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
-              <div className="bg-[#edf3fa] p-6 sm:p-10 md:p-14 flex-1 flex flex-col">
-                <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-blue-900 mb-2.5 sm:mb-3 font-semibold">
-                  FINANCIAL TECHNOLOGY
-                </p>
-                <h2 className="font-gt-america text-2xl sm:text-3xl md:text-[42px] lg:text-[46px] text-neutral-900 tracking-tight leading-[1.14] mb-4 sm:mb-5 font-bold">
+            <article id="card-keuangan" className="relative w-[82vw] sm:w-[420px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[24px] sm:rounded-[32px] overflow-hidden border border-sky-100 shadow-[0_12px_36px_rgba(2,132,199,0.08)] hover:shadow-[0_22px_50px_rgba(2,132,199,0.18)] transition-all duration-300 bg-gradient-to-br from-[#f0f8ff] via-[#e2f0fe] to-[#bae6fd]/50">
+              {/* Ambient Vibrant Glow Orb */}
+              <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 bg-sky-500/15 rounded-full blur-3xl" />
+
+              <div className="p-4 sm:p-7 md:p-10 lg:p-12 flex-1 flex flex-col relative z-10">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-100/90 border border-sky-200/80 text-sky-900 text-[10.5px] sm:text-[11.5px] font-bold tracking-wide uppercase mb-2 self-start shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-600 animate-pulse" />
+                  <span>Financial Technology</span>
+                </div>
+                <h2 className="font-gt-america text-xl sm:text-2xl md:text-3xl lg:text-[40px] text-neutral-900 tracking-tight leading-[1.18] mb-1.5 sm:mb-2 font-bold">
                   Aplikasi Keuangan
                 </h2>
-                <p className="text-[15px] sm:text-[17px] text-[#555555] max-w-2xl leading-relaxed mb-8 sm:mb-10 font-normal">
-                  Aplikasi pelacak keuangan cerdas dengan fitur mode ganda (Pribadi &amp; Bisnis), visualisasi donut chart pengeluaran per kategori, dan grafik analitik arus kas bulanan untuk menjaga stabilitas finansial.
+                <p className="text-[12.5px] sm:text-[14px] md:text-[15.5px] text-neutral-600 max-w-xl leading-relaxed mb-3.5 sm:mb-5 font-normal">
+                  Pelacak keuangan cerdas mode ganda (Pribadi &amp; Bisnis) dengan visualisasi donut chart dan grafik analitik arus kas bulanan real-time.
                 </p>
 
                 {/* Real Mobile Mockups Frame */}
-                <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-4 sm:gap-7 py-2 max-w-2xl mx-auto">
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 sm:gap-5 py-1 max-w-md mx-auto">
                   {/* Phone 1: Beranda Keuangan */}
-                  <div className="w-[185px] sm:w-[215px] rounded-[26px] sm:rounded-[30px] overflow-hidden border-[3.5px] border-neutral-900 bg-white shadow-[0_20px_45px_rgba(0,0,0,0.13)] shrink-0">
+                  <div className="w-[135px] sm:w-[165px] md:w-[200px] rounded-[22px] sm:rounded-[28px] overflow-hidden border-[3px] border-neutral-900 bg-white shadow-[0_16px_36px_rgba(2,132,199,0.15)] shrink-0">
                     <img src="/projects/keuangan_beranda.png" alt="Aplikasi Keuangan - Beranda" className="w-full h-auto object-cover block" />
                   </div>
                   {/* Phone 2: Laporan Arus Kas */}
-                  <div className="w-[185px] sm:w-[215px] rounded-[26px] sm:rounded-[30px] overflow-hidden border-[3.5px] border-neutral-900 bg-white shadow-[0_20px_45px_rgba(0,0,0,0.13)] shrink-0 hidden xs:block">
+                  <div className="w-[135px] sm:w-[165px] md:w-[200px] rounded-[22px] sm:rounded-[28px] overflow-hidden border-[3px] border-neutral-900 bg-white shadow-[0_16px_36px_rgba(2,132,199,0.15)] shrink-0 hidden xs:block">
                     <img src="/projects/keuangan_laporan.png" alt="Aplikasi Keuangan - Laporan Arus Kas" className="w-full h-auto object-cover block" />
                   </div>
                 </div>
               </div>
 
               {/* Signature Footer Card Bar */}
-              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 mt-auto">
-                <div className="flex items-center gap-3 sm:gap-3.5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden shadow-xs shrink-0 border border-neutral-100 bg-[#2c7be5] flex items-center justify-center">
+              <div className="bg-white/95 px-4 sm:px-7 py-3 sm:py-4 border-t border-sky-100 flex flex-wrap items-center justify-between gap-3 relative z-10 mt-auto">
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-xs shrink-0 border border-neutral-100 bg-[#2c7be5] flex items-center justify-center">
                     <img src="/projects/keuangan_logo.png" alt="Logo Aplikasi Keuangan" className="w-full h-full object-cover" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-neutral-900">Aplikasi Keuangan</h4>
-                    <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
+                    <h4 className="font-bold text-xs sm:text-sm text-neutral-900">Aplikasi Keuangan</h4>
+                    <div className="flex items-center gap-1 text-[11px] sm:text-xs text-amber-500 font-bold">
                       ★★★★★ <span className="text-neutral-500 font-medium">Personal &amp; Business</span>
                     </div>
                   </div>
@@ -998,18 +1050,18 @@ export default function JonnyCzarPortfolioPage() {
 
                 <div className="hidden sm:flex items-center gap-6 sm:gap-8">
                   <div>
-                    <p className="font-extrabold text-sm text-neutral-900">Dual Mode</p>
-                    <p className="text-xs text-neutral-500">Pribadi &amp; Bisnis</p>
+                    <p className="font-extrabold text-xs sm:text-sm text-neutral-900">Dual Mode</p>
+                    <p className="text-[11px] text-neutral-500">Pribadi &amp; Bisnis</p>
                   </div>
                   <div>
-                    <p className="font-extrabold text-sm text-neutral-900">Real-Time</p>
-                    <p className="text-xs text-neutral-500">Analitik Arus Kas</p>
+                    <p className="font-extrabold text-xs sm:text-sm text-neutral-900">Real-Time</p>
+                    <p className="text-[11px] text-neutral-500">Analitik Arus Kas</p>
                   </div>
                 </div>
 
                 <a 
                   href="mailto:nazalanmuaffari@gmail.com?subject=Tanya%20Aplikasi%20Keuangan" 
-                  className="rounded-full bg-neutral-900 hover:bg-neutral-800 text-white px-5 sm:px-7 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shrink-0 ml-auto sm:ml-0"
+                  className="rounded-full bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-1.5 sm:px-6 sm:py-2.5 text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ml-auto sm:ml-0 shadow-xs"
                 >
                   <span>Detail Aplikasi</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -1018,35 +1070,46 @@ export default function JonnyCzarPortfolioPage() {
             </article>
 
             {/* ELEVATION CARD 3: Aplikasi MyLife Productivity */}
-            <article id="card-mylife" className="w-[86vw] sm:w-[480px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[28px] sm:rounded-[36px] overflow-hidden border border-neutral-200/80 shadow-[0_12px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-300">
-              <div className="bg-[#eef8f2] p-6 sm:p-10 md:p-14 flex-1 flex flex-col">
-                <p className="font-gt-america text-[14px] sm:text-[16px] uppercase tracking-wider text-emerald-900 mb-2.5 sm:mb-3 font-semibold">
-                  PRODUCTIVITY &amp; DEEP WORK
-                </p>
-                <h2 className="font-gt-america text-2xl sm:text-3xl md:text-[42px] lg:text-[46px] text-neutral-900 tracking-tight leading-[1.14] mb-4 sm:mb-5 font-bold">
+            <article id="card-mylife" className="relative w-[82vw] sm:w-[420px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[24px] sm:rounded-[32px] overflow-hidden border border-emerald-100 shadow-[0_12px_36px_rgba(16,185,129,0.08)] hover:shadow-[0_22px_50px_rgba(16,185,129,0.18)] transition-all duration-300 bg-gradient-to-br from-[#f0fdf4] via-[#ecfdf5] to-[#d1fae5]/50">
+              {/* Ambient Vibrant Glow Orb */}
+              <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 bg-emerald-500/18 rounded-full blur-3xl" />
+
+              <div className="p-4 sm:p-7 md:p-10 lg:p-12 flex-1 flex flex-col relative z-10">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100/90 border border-emerald-200/80 text-emerald-900 text-[10.5px] sm:text-[11.5px] font-bold tracking-wide uppercase mb-2 self-start shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                  <span>Productivity &amp; Deep Work</span>
+                </div>
+                <h2 className="font-gt-america text-xl sm:text-2xl md:text-3xl lg:text-[40px] text-neutral-900 tracking-tight leading-[1.18] mb-1.5 sm:mb-2 font-bold">
                   Aplikasi MyLife Productivity
                 </h2>
-                <p className="text-[15px] sm:text-[17px] text-[#555555] max-w-2xl leading-relaxed mb-8 sm:mb-10 font-normal">
-                  Asisten produktivitas harian terintegrasi: pelacak konsistensi kebiasaan (habit tracker), checklist target harian bertahap, dan sesi Pomodoro 25 menit bebas distraksi untuk fokus kerja mendalam.
+                <p className="text-[12.5px] sm:text-[14px] md:text-[15.5px] text-neutral-600 max-w-xl leading-relaxed mb-3.5 sm:mb-5 font-normal">
+                  Asisten produktivitas terintegrasi dengan habit tracker, target harian bertahap, dan sesi fokus Pomodoro 25 menit bebas distraksi.
                 </p>
 
                 {/* Real Mobile Mockup Frame */}
-                <div className="flex items-center justify-center py-2 max-w-md mx-auto">
-                  <div className="w-[200px] sm:w-[230px] rounded-[26px] sm:rounded-[30px] overflow-hidden border-[3.5px] border-neutral-900 bg-white shadow-[0_20px_45px_rgba(0,0,0,0.13)]">
+                <div className="flex items-center justify-center py-1 max-w-xs mx-auto">
+                  <div 
+                    onClick={() => setPreviewCert({
+                      src: '/projects/mylife_home.png',
+                      title: 'Aplikasi MyLife Productivity',
+                      subtitle: 'Habit Tracker, Target Harian, & Sesi Pomodoro 25 Menit'
+                    })}
+                    className="w-[140px] sm:w-[170px] md:w-[210px] rounded-[22px] sm:rounded-[28px] overflow-hidden border-[3px] border-neutral-900 bg-white shadow-[0_16px_36px_rgba(16,185,129,0.18)] cursor-pointer group hover:scale-[1.03] transition-all duration-300"
+                  >
                     <img src="/projects/mylife_home.png" alt="Aplikasi MyLife Productivity" className="w-full h-auto object-cover block" />
                   </div>
                 </div>
               </div>
 
               {/* Signature Footer Card Bar */}
-              <div className="bg-white px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 mt-auto">
-                <div className="flex items-center gap-3 sm:gap-3.5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl overflow-hidden shadow-xs shrink-0 bg-white border border-neutral-200/80 p-1.5 flex items-center justify-center">
+              <div className="bg-white/95 px-4 sm:px-7 py-3 sm:py-4 border-t border-emerald-100 flex flex-wrap items-center justify-between gap-3 relative z-10 mt-auto">
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl overflow-hidden shadow-xs shrink-0 bg-white border border-neutral-200/80 p-1.5 flex items-center justify-center">
                     <img src="/projects/mylife_logo.png" alt="Logo MyLife Productivity" className="w-full h-full object-contain" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-neutral-900">MyLife Productivity</h4>
-                    <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
+                    <h4 className="font-bold text-xs sm:text-sm text-neutral-900">MyLife Productivity</h4>
+                    <div className="flex items-center gap-1 text-[11px] sm:text-xs text-amber-500 font-bold">
                       ★★★★★ <span className="text-neutral-500 font-medium">Deep Work Companion</span>
                     </div>
                   </div>
@@ -1054,18 +1117,18 @@ export default function JonnyCzarPortfolioPage() {
 
                 <div className="hidden sm:flex items-center gap-6 sm:gap-8">
                   <div>
-                    <p className="font-extrabold text-sm text-neutral-900">Pomodoro 25m</p>
-                    <p className="text-xs text-neutral-500">Focus Session</p>
+                    <p className="font-extrabold text-xs sm:text-sm text-neutral-900">Pomodoro 25m</p>
+                    <p className="text-[11px] text-neutral-500">Focus Session</p>
                   </div>
                   <div>
-                    <p className="font-extrabold text-sm text-neutral-900">Habit Matrix</p>
-                    <p className="text-xs text-neutral-500">Daily Consistency</p>
+                    <p className="font-extrabold text-xs sm:text-sm text-neutral-900">Habit Matrix</p>
+                    <p className="text-[11px] text-neutral-500">Daily Consistency</p>
                   </div>
                 </div>
 
                 <a 
                   href="mailto:nazalanmuaffari@gmail.com?subject=Tanya%20MyLife%20Productivity" 
-                  className="rounded-full bg-neutral-900 hover:bg-neutral-800 text-white px-5 sm:px-7 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shrink-0 ml-auto sm:ml-0"
+                  className="rounded-full bg-neutral-900 hover:bg-neutral-800 text-white px-3.5 py-1.5 sm:px-6 sm:py-2.5 text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ml-auto sm:ml-0 shadow-xs"
                 >
                   <span>Detail Aplikasi</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -1074,65 +1137,57 @@ export default function JonnyCzarPortfolioPage() {
             </article>
 
             {/* ELEVATION CARD 4: NAZZGRAM Official Store */}
-            <article id="card-shopee" className="relative w-[86vw] sm:w-[480px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[28px] sm:rounded-[36px] overflow-hidden border border-orange-100 shadow-[0_15px_40px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_55px_rgba(0,0,0,0.09)] transition-all duration-300 bg-gradient-to-br from-[#ffffff] via-[#fff7ed] to-[#fed7aa]/35">
-              {/* Vibrant Ambient Glow */}
-              <div className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 bg-orange-500/12 rounded-full blur-3xl" />
+            <article id="card-shopee" className="relative w-[82vw] sm:w-[420px] lg:w-full lg:max-w-none shrink-0 snap-center flex flex-col justify-between rounded-[24px] sm:rounded-[32px] overflow-hidden border border-orange-100 shadow-[0_12px_36px_rgba(238,77,45,0.08)] hover:shadow-[0_22px_50px_rgba(238,77,45,0.18)] transition-all duration-300 bg-gradient-to-br from-[#fff7ed] via-[#ffedd5] to-[#fed7aa]/50">
+              {/* Ambient Vibrant Glow Orb */}
+              <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 bg-orange-500/18 rounded-full blur-3xl" />
 
-              <div className="p-6 sm:p-10 md:p-12 relative z-10 flex-1 flex flex-col">
-                <div className="flex flex-wrap items-center gap-2 mb-2.5 sm:mb-3">
-                  <span className="font-gt-america text-[13px] sm:text-[15px] uppercase tracking-wider text-[#ee4d2d] font-bold">
-                    DIGITAL COMMERCE • 5+ TAHUN
-                  </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-orange-100 text-[#ee4d2d] text-[11px] font-bold">
-                    ★ 4.9 Star Rating
-                  </span>
+              <div className="p-4 sm:p-7 md:p-10 lg:p-12 relative z-10 flex-1 flex flex-col">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-100/90 border border-orange-200/80 text-[#ee4d2d] text-[10.5px] sm:text-[11.5px] font-bold tracking-wide uppercase mb-2 self-start shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#ee4d2d] animate-pulse" />
+                  <span>Digital Commerce • 5+ Tahun</span>
                 </div>
-                <h2 className="font-gt-america text-2xl sm:text-3xl md:text-[42px] lg:text-[46px] text-neutral-900 tracking-tight leading-[1.14] mb-3 sm:mb-4 font-bold">
+                <h2 className="font-gt-america text-xl sm:text-2xl md:text-3xl lg:text-[40px] text-neutral-900 tracking-tight leading-[1.18] mb-1.5 sm:mb-2 font-bold">
                   NAZZGRAM Official Store
                 </h2>
-                {/* Concise, punchy description highlighting only key merits */}
-                <p className="text-[15px] sm:text-[17px] text-neutral-600 max-w-2xl leading-relaxed mb-6 sm:mb-8 font-normal">
-                  Toko ritel e-commerce terpercaya dengan reputasi bintang ★ 4.9 di Shopee. Beroperasi lebih dari 5 tahun dengan keunggulan pemenuhan pesanan cepat, respon chat 95% dalam hitungan menit, dan komitmen kepuasan pelanggan tinggi.
+                <p className="text-[12.5px] sm:text-[14px] md:text-[15.5px] text-neutral-600 max-w-xl leading-relaxed mb-3.5 sm:mb-5 font-normal">
+                  Official store ritel e-commerce di Shopee dengan rating ★ 4.9, 57.6RB+ pengikut, dan performa respon chat cepat 95%.
                 </p>
 
                 {/* Modern Shopee Verified Store Showcase Card */}
-                <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-[0_15px_35px_rgba(0,0,0,0.06)] border border-neutral-200/80 max-w-3xl mx-auto overflow-hidden">
+                <div className="bg-white/95 rounded-2xl p-3.5 sm:p-5 shadow-[0_10px_25px_rgba(0,0,0,0.05)] border border-orange-100/80 max-w-2xl mx-auto overflow-hidden">
                   
                   {/* Verified Store Profile Header Row */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 pb-4 mb-4">
-                    <div className="flex items-center gap-3">
-                      {/* Avatar with verified check */}
+                  <div className="flex items-center justify-between gap-2.5 border-b border-neutral-100 pb-2.5 mb-2.5">
+                    <div className="flex items-center gap-2.5">
                       <div className="relative">
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white border-2 border-orange-400/90 shadow-xs flex items-center justify-center p-1.5 overflow-hidden">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white border border-orange-300 shadow-2xs flex items-center justify-center p-1 overflow-hidden">
                           <img 
                             src="/projects/nazzgram_logo.png" 
                             alt="Logo NAZZGRAM" 
                             className="w-full h-full object-contain"
                           />
                         </div>
-                        <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center" title="Aktif">
-                          <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center">
+                          <span className="w-1 h-1 rounded-full bg-white" />
                         </span>
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <h4 className="font-bold text-base sm:text-lg text-neutral-900">NAZZGRAM</h4>
-                          <span className="px-2 py-0.5 rounded-md bg-[#ee4d2d] text-white text-[10px] font-bold tracking-wider">
+                          <h4 className="font-bold text-sm sm:text-base text-neutral-900">NAZZGRAM</h4>
+                          <span className="px-1.5 py-0.2 rounded bg-[#ee4d2d] text-white text-[9.5px] font-bold">
                             Star Seller
                           </span>
                         </div>
-                        <p className="text-xs text-neutral-500 mt-0.5 flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                          <span>Aktif 2 menit lalu • Bergabung 5 Tahun</span>
+                        <p className="text-[11px] text-neutral-500 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                          <span>5+ Tahun di Shopee</span>
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                        ★ 4.9 (7,5RB Penilaian)
-                      </span>
-                    </div>
+                    <span className="text-[11px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 shrink-0">
+                      ★ 4.9 (7,5RB)
+                    </span>
                   </div>
 
                   {/* Banner Preview Frame with Click to Zoom */}
@@ -1142,7 +1197,7 @@ export default function JonnyCzarPortfolioPage() {
                       title: 'Profil Toko Shopee NAZZGRAM',
                       subtitle: '57.6K Pengikut • 7.5K Ulasan • Rating ★ 4.9 • 5 Tahun di Shopee'
                     })}
-                    className="relative rounded-xl sm:rounded-2xl overflow-hidden border border-neutral-200/90 shadow-xs mb-5 cursor-pointer group/shopee bg-neutral-50"
+                    className="relative rounded-xl overflow-hidden border border-neutral-200/80 shadow-2xs mb-3 cursor-pointer group/shopee bg-neutral-50 max-h-[140px] sm:max-h-[190px]"
                   >
                     <img 
                       src="/projects/nazzgram_store.png" 
@@ -1150,64 +1205,56 @@ export default function JonnyCzarPortfolioPage() {
                       className="w-full h-auto object-cover block transition-transform duration-300 group-hover/shopee:scale-[1.01]"
                     />
                     <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/shopee:opacity-100 transition-opacity duration-200 flex items-center justify-center backdrop-blur-[1px]">
-                      <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 text-neutral-900 text-xs font-bold shadow-md">
-                        <ZoomIn className="w-3.5 h-3.5 text-[#ee4d2d]" />
-                        <span>Perbesar Tampilan Toko HD</span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 text-neutral-900 text-[11px] font-bold shadow-md">
+                        <ZoomIn className="w-3 h-3 text-[#ee4d2d]" />
+                        <span>Perbesar HD</span>
                       </span>
                     </div>
                   </div>
 
-                  {/* 4 High-Impact Metric Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 text-left mb-4">
-                    <div className="p-3 sm:p-3.5 rounded-xl bg-orange-50/70 border border-orange-100">
-                      <p className="text-[11px] text-neutral-500 font-medium">Pengikut Shopee</p>
-                      <p className="text-lg sm:text-xl font-extrabold text-neutral-900 mt-0.5">57,6RB+</p>
-                      <p className="text-[10px] text-orange-700 font-semibold mt-0.5">Komunitas Loyal</p>
+                  {/* 2 Metrics on Mobile, 4 on Desktop */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left mb-2.5">
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-orange-50/70 border border-orange-100">
+                      <p className="text-[10px] text-neutral-500 font-medium">Pengikut</p>
+                      <p className="text-base sm:text-lg font-extrabold text-neutral-900 leading-tight">57,6RB+</p>
                     </div>
-                    <div className="p-3 sm:p-3.5 rounded-xl bg-orange-50/70 border border-orange-100">
-                      <p className="text-[11px] text-neutral-500 font-medium">Ulasan Pembeli</p>
-                      <p className="text-lg sm:text-xl font-extrabold text-neutral-900 mt-0.5">7,5RB+</p>
-                      <p className="text-[10px] text-amber-700 font-semibold mt-0.5">Rating ★ 4.9 / 5.0</p>
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-orange-50/70 border border-orange-100">
+                      <p className="text-[10px] text-neutral-500 font-medium">Ulasan</p>
+                      <p className="text-base sm:text-lg font-extrabold text-neutral-900 leading-tight">7,5RB+ ★4.9</p>
                     </div>
-                    <div className="p-3 sm:p-3.5 rounded-xl bg-orange-50/70 border border-orange-100">
-                      <p className="text-[11px] text-neutral-500 font-medium">Jam Terbang</p>
-                      <p className="text-lg sm:text-xl font-extrabold text-neutral-900 mt-0.5">5+ Tahun</p>
-                      <p className="text-[10px] text-emerald-700 font-semibold mt-0.5">Sejak 2021</p>
+                    <div className="hidden sm:block p-2 sm:p-2.5 rounded-lg bg-orange-50/70 border border-orange-100">
+                      <p className="text-[10px] text-neutral-500 font-medium">Pengalaman</p>
+                      <p className="text-base sm:text-lg font-extrabold text-neutral-900 leading-tight">5+ Tahun</p>
                     </div>
-                    <div className="p-3 sm:p-3.5 rounded-xl bg-orange-50/70 border border-orange-100">
-                      <p className="text-[11px] text-neutral-500 font-medium">Performa Chat</p>
-                      <p className="text-lg sm:text-xl font-extrabold text-neutral-900 mt-0.5">95%</p>
-                      <p className="text-[10px] text-blue-700 font-semibold mt-0.5">Hitungan Menit</p>
+                    <div className="hidden sm:block p-2 sm:p-2.5 rounded-lg bg-orange-50/70 border border-orange-100">
+                      <p className="text-[10px] text-neutral-500 font-medium">Chat Respon</p>
+                      <p className="text-base sm:text-lg font-extrabold text-neutral-900 leading-tight">95%</p>
                     </div>
                   </div>
 
                   {/* Highlights Pill Badges */}
-                  <div className="pt-3 border-t border-neutral-100 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-orange-50/60 text-orange-950 text-xs font-semibold">
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Same-Day Order Processing</span>
+                  <div className="pt-2 border-t border-neutral-100 flex flex-wrap gap-1.5">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-orange-50 text-orange-950 text-[10.5px] font-semibold">
+                      <Check className="w-3 h-3 text-emerald-600" />
+                      <span>Same-Day Processing</span>
                     </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-orange-50/60 text-orange-950 text-xs font-semibold">
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>0.0% Tingkat Pembatalan</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-orange-50/60 text-orange-950 text-xs font-semibold">
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Respon Chat Ramah &amp; Cepat</span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-orange-50 text-orange-950 text-[10.5px] font-semibold">
+                      <Check className="w-3 h-3 text-emerald-600" />
+                      <span>0.0% Batal</span>
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* Signature Footer Card Bar */}
-              <div className="bg-white/95 px-5 sm:px-8 py-4 sm:py-5 border-t border-neutral-100 flex flex-wrap items-center justify-between gap-4 relative z-10 mt-auto">
-                <div className="flex items-center gap-3 sm:gap-3.5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white border border-neutral-200/80 p-1.5 flex items-center justify-center shadow-xs shrink-0">
+              <div className="bg-white/95 px-4 sm:px-7 py-3 sm:py-4 border-t border-orange-100 flex flex-wrap items-center justify-between gap-3 relative z-10 mt-auto">
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white border border-neutral-200/80 p-1 flex items-center justify-center shadow-xs shrink-0">
                     <img src="/projects/nazzgram_logo.png" alt="Logo NAZZGRAM" className="w-full h-full object-contain" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-neutral-900">NAZZGRAM Store</h4>
-                    <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
+                    <h4 className="font-bold text-xs sm:text-sm text-neutral-900">NAZZGRAM Store</h4>
+                    <div className="flex items-center gap-1 text-[11px] sm:text-xs text-amber-500 font-bold">
                       ★★★★★ <span className="text-neutral-500 font-medium">4.9 • 57.6K Followers</span>
                     </div>
                   </div>
@@ -1215,12 +1262,12 @@ export default function JonnyCzarPortfolioPage() {
 
                 <div className="hidden sm:flex items-center gap-6 sm:gap-8">
                   <div>
-                    <p className="font-extrabold text-sm text-neutral-900">57,6RB+</p>
-                    <p className="text-xs text-neutral-500">Followers Shopee</p>
+                    <p className="font-extrabold text-xs sm:text-sm text-neutral-900">57,6RB+</p>
+                    <p className="text-[11px] text-neutral-500">Followers Shopee</p>
                   </div>
                   <div>
-                    <p className="font-extrabold text-sm text-neutral-900">7,5RB+</p>
-                    <p className="text-xs text-neutral-500">Ulasan Pembeli</p>
+                    <p className="font-extrabold text-xs sm:text-sm text-neutral-900">7,5RB+</p>
+                    <p className="text-[11px] text-neutral-500">Ulasan Pembeli</p>
                   </div>
                 </div>
 
@@ -1228,9 +1275,9 @@ export default function JonnyCzarPortfolioPage() {
                   href="https://shopee.co.id/nazzgram" 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="rounded-full bg-[#ee4d2d] hover:bg-[#d03b1b] text-white px-5 sm:px-7 py-2.5 sm:py-3 text-xs font-bold transition-all flex items-center gap-2 shrink-0 ml-auto sm:ml-0 shadow-xs"
+                  className="rounded-full bg-[#ee4d2d] hover:bg-[#d03b1b] text-white px-3.5 py-1.5 sm:px-6 sm:py-2.5 text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ml-auto sm:ml-0 shadow-xs"
                 >
-                  <span>Kunjungi Toko Shopee</span>
+                  <span>Kunjungi Toko</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </a>
               </div>
@@ -1244,9 +1291,12 @@ export default function JonnyCzarPortfolioPage() {
                 <button
                   key={project.id}
                   type="button"
-                  onClick={() => scrollToCardIndex(idx)}
-                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                    activeCardIndex === idx ? 'w-7 bg-neutral-900' : 'w-2 bg-neutral-300 hover:bg-neutral-400'
+                  onClick={() => {
+                    pauseAutoPlayTemporarily(7500);
+                    scrollToCardIndex(idx);
+                  }}
+                  className={`h-2 rounded-full transition-all duration-400 cursor-pointer ${
+                    activeCardIndex === idx ? 'w-8 bg-neutral-900 shadow-2xs' : 'w-2 bg-neutral-300 hover:bg-neutral-400'
                   }`}
                   aria-label={`Lihat ${project.title}`}
                 />
