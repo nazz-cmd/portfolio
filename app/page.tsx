@@ -274,6 +274,7 @@ export default function JonnyCzarPortfolioPage() {
       desc: 'Platform web inklusif ramah disabilitas (WCAG 2.1 AAA) dengan Text-to-Speech alami, transkripsi real-time, dan modul kamus bahasa isyarat BISINDO.',
       logo: '/projects/ablefy_logo.svg',
       logoBg: 'bg-[#0f172a]',
+      mockupBg: 'bg-[#0f172a]',
       ringColor: 'border-indigo-500 shadow-[0_0_18px_rgba(99,102,241,0.28)]',
       badgeColor: 'text-indigo-600',
       btnGradient: 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/25',
@@ -291,6 +292,7 @@ export default function JonnyCzarPortfolioPage() {
       desc: 'Sistem informasi perkuliahan real-time untuk mengoordinasikan jadwal, bank materi kuliah, dan tugas harian bagi 38 mahasiswa aktif.',
       logo: '/projects/portal_logo.svg',
       logoBg: 'bg-[#0f172a]',
+      mockupBg: 'bg-[#0f172a]',
       ringColor: 'border-blue-600 shadow-[0_0_18px_rgba(37,99,235,0.28)]',
       badgeColor: 'text-blue-600',
       btnGradient: 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/25',
@@ -308,6 +310,7 @@ export default function JonnyCzarPortfolioPage() {
       desc: 'Pelacak keuangan cerdas mode ganda (Pribadi & Bisnis) dengan visualisasi donut chart pengeluaran dan grafik arus kas bulanan real-time.',
       logo: '/projects/keuangan_logo.png',
       logoBg: 'bg-[#2c7be5]',
+      mockupBg: 'bg-[#f0f9ff]',
       ringColor: 'border-sky-500 shadow-[0_0_18px_rgba(14,165,233,0.28)]',
       badgeColor: 'text-sky-600',
       btnGradient: 'bg-sky-600 hover:bg-sky-700 shadow-sky-500/25',
@@ -325,6 +328,7 @@ export default function JonnyCzarPortfolioPage() {
       desc: 'Asisten produktivitas harian terintegrasi dengan habit tracker konsistensi, checklist target harian, dan sesi fokus Pomodoro 25 menit.',
       logo: '/projects/mylife_logo.png',
       logoBg: 'bg-white',
+      mockupBg: 'bg-[#ecfdf5]',
       ringColor: 'border-emerald-500 shadow-[0_0_18px_rgba(16,185,129,0.28)]',
       badgeColor: 'text-emerald-600',
       btnGradient: 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/25',
@@ -342,6 +346,7 @@ export default function JonnyCzarPortfolioPage() {
       desc: 'Official store ritel e-commerce terpercaya dengan reputasi bintang ★ 4.9 di Shopee selama 5+ tahun, 57.6RB+ pengikut, dan respon chat 95%.',
       logo: '/projects/nazzgram_logo.png',
       logoBg: 'bg-white',
+      mockupBg: 'bg-[#fff7ed]',
       ringColor: 'border-[#ee4d2d] shadow-[0_0_18px_rgba(238,77,45,0.28)]',
       badgeColor: 'text-[#ee4d2d]',
       btnGradient: 'bg-[#ee4d2d] hover:bg-[#d03b1b] shadow-orange-500/25',
@@ -822,7 +827,7 @@ export default function JonnyCzarPortfolioPage() {
 
         {/* 3D AutoPlay Card Slider Stage */}
         <div 
-          className="relative w-full max-w-5xl mx-auto h-[460px] xs:h-[480px] sm:h-[500px] flex items-center justify-center overflow-visible select-none py-2"
+          className="relative w-full max-w-5xl mx-auto h-[420px] xs:h-[435px] sm:h-[455px] flex items-center justify-center overflow-visible select-none py-2"
           onMouseEnter={() => setIsAutoPlayPaused(true)}
           onMouseLeave={() => setIsAutoPlayPaused(false)}
           onTouchStart={handleTouchStart}
@@ -832,18 +837,18 @@ export default function JonnyCzarPortfolioPage() {
           <button
             type="button"
             onClick={() => scrollCard('prev')}
-            className="absolute left-1 sm:left-4 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 backdrop-blur-md border border-neutral-200/90 shadow-[0_8px_25px_rgba(0,0,0,0.12)] flex items-center justify-center text-neutral-800 hover:text-black hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="absolute left-0.5 sm:left-2 z-40 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 backdrop-blur-md border border-neutral-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.12)] flex items-center justify-center text-neutral-800 hover:text-black hover:scale-105 active:scale-95 transition-all cursor-pointer"
             aria-label="Proyek Sebelumnya"
           >
-            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
           <button
             type="button"
             onClick={() => scrollCard('next')}
-            className="absolute right-1 sm:right-4 z-40 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 backdrop-blur-md border border-neutral-200/90 shadow-[0_8px_25px_rgba(0,0,0,0.12)] flex items-center justify-center text-neutral-800 hover:text-black hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="absolute right-0.5 sm:right-2 z-40 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 backdrop-blur-md border border-neutral-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.12)] flex items-center justify-center text-neutral-800 hover:text-black hover:scale-105 active:scale-95 transition-all cursor-pointer"
             aria-label="Proyek Selanjutnya"
           >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           {/* Cards Track with 3D Center-Scale CoverFlow Layout */}
@@ -857,8 +862,8 @@ export default function JonnyCzarPortfolioPage() {
             const isNeighbor = Math.abs(diff) === 1;
 
             // Calculate exact translation and scale
-            const scale = isActive ? 1.05 : isNeighbor ? 0.91 : 0.78;
-            const translateX = `calc(-50% + ${diff * 92}%)`;
+            const scale = isActive ? 1.04 : isNeighbor ? 0.88 : 0.72;
+            const translateX = `calc(-50% + ${diff * 76}%)`;
 
             return (
               <article
@@ -870,21 +875,21 @@ export default function JonnyCzarPortfolioPage() {
                     setActiveCardIndex(idx);
                   }
                 }}
-                className={`absolute top-1/2 left-1/2 w-[265px] xs:w-[280px] sm:w-[305px] h-[405px] xs:h-[420px] sm:h-[440px] rounded-[26px] sm:rounded-[30px] bg-white flex flex-col items-center text-center p-5 sm:p-6 justify-between transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform ${
+                className={`absolute top-1/2 left-1/2 w-[215px] xs:w-[230px] sm:w-[250px] md:w-[270px] h-[370px] xs:h-[385px] sm:h-[400px] rounded-[22px] sm:rounded-[26px] bg-white flex flex-col p-3 sm:p-3.5 justify-between transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform ${
                   isActive
-                    ? 'border-2 border-neutral-900/10 shadow-[0_22px_55px_rgba(0,0,0,0.14)] z-30 opacity-100'
+                    ? 'border border-neutral-900/10 shadow-[0_18px_45px_rgba(0,0,0,0.12)] z-30 opacity-100'
                     : isNeighbor
-                      ? 'border border-neutral-200/80 shadow-[0_10px_30px_rgba(0,0,0,0.06)] z-20 opacity-75 hover:opacity-90 cursor-pointer'
-                      : 'border border-neutral-200/60 shadow-[0_8px_20px_rgba(0,0,0,0.04)] z-10 opacity-0 md:opacity-40 pointer-events-none md:pointer-events-auto cursor-pointer'
+                      ? 'border border-neutral-200/80 shadow-[0_8px_24px_rgba(0,0,0,0.06)] z-20 opacity-85 hover:opacity-100 cursor-pointer'
+                      : 'border border-neutral-200/60 shadow-[0_6px_16px_rgba(0,0,0,0.04)] z-10 opacity-0 md:opacity-35 pointer-events-none md:pointer-events-auto cursor-pointer'
                 }`}
                 style={{
                   transform: `translate(${translateX}, -50%) scale(${scale})`,
                   zIndex: isActive ? 30 : isNeighbor ? 20 : 10,
                 }}
               >
-                {/* Circular Logo / Image with Double Ring Frame (Exact Reference Design) */}
+                {/* Mockup Preview Device Screen (Top Viewport with Real Mockup & Floating Brand Badge) */}
                 <div 
-                  className="relative mt-1 mb-2 group/avatar cursor-pointer shrink-0"
+                  className={`relative w-full h-[145px] xs:h-[155px] sm:h-[165px] rounded-[16px] sm:rounded-[18px] overflow-hidden ${project.mockupBg} border border-neutral-200/80 shadow-xs group/mockup cursor-pointer shrink-0`}
                   onClick={(e) => {
                     e.stopPropagation();
                     setPreviewCert({
@@ -893,58 +898,53 @@ export default function JonnyCzarPortfolioPage() {
                       subtitle: project.mockupSubtitle,
                     });
                   }}
-                  title="Klik untuk melihat pratinjau mockup HD"
+                  title="Klik untuk perbesar pratinjau mockup HD"
                 >
-                  <div className={`w-20 h-20 sm:w-22 sm:h-22 rounded-full p-1 border-[2.5px] transition-transform duration-300 group-hover/avatar:scale-105 ${project.ringColor}`}>
-                    <div className={`w-full h-full rounded-full ${project.logoBg} flex items-center justify-center p-2.5 overflow-hidden shadow-inner`}>
-                      <img src={project.logo} alt={project.title} className="w-full h-full object-contain" />
-                    </div>
+                  <img 
+                    src={project.mockupImg} 
+                    alt={project.title} 
+                    className={`w-full h-full ${project.id === 'card-shopee' ? 'object-cover object-[20%_center]' : 'object-cover object-top'} transition-transform duration-300 group-hover/mockup:scale-105`} 
+                  />
+
+                  {/* Subtle Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10 pointer-events-none" />
+
+                  {/* Floating Brand Logo Badge at Top-Left */}
+                  <div className="absolute top-2 left-2 w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/95 backdrop-blur-md p-1 shadow-md border border-black/5 flex items-center justify-center">
+                    <img src={project.logo} alt={project.title} className="w-full h-full object-contain" />
                   </div>
-                  <span className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white shadow-md border border-neutral-200 flex items-center justify-center text-neutral-600 hover:text-black transition-colors" title="Lihat Pratinjau Mockup">
-                    <ZoomIn className="w-3 h-3" />
+
+                  {/* Floating Quick Zoom Pill at Top-Right */}
+                  <span className="absolute top-2 right-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center shadow-md backdrop-blur-xs transition-colors" title="Perbesar HD">
+                    <ZoomIn className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </span>
                 </div>
 
                 {/* Card Editorial Info */}
-                <div className="w-full px-1 flex-1 flex flex-col justify-center">
-                  <h3 className="font-gt-america text-[17px] sm:text-[19px] font-bold text-neutral-900 tracking-tight leading-snug line-clamp-1 mb-1">
+                <div className="w-full flex-1 flex flex-col justify-center text-left pt-2 px-1">
+                  <h3 className="font-gt-america text-[14px] xs:text-[15px] sm:text-[16px] font-bold text-neutral-900 tracking-tight leading-snug line-clamp-1">
                     {project.title}
                   </h3>
-                  <p className={`text-[11px] sm:text-[12px] font-bold uppercase tracking-wider mb-2.5 ${project.badgeColor}`}>
+                  <p className={`text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider mt-0.5 mb-1 line-clamp-1 ${project.badgeColor}`}>
                     {project.role}
                   </p>
-                  <p className="text-[12px] sm:text-[12.5px] text-neutral-500 leading-relaxed font-normal px-1 line-clamp-3">
+                  <p className="text-[11px] sm:text-[11.5px] text-neutral-500 leading-snug font-normal line-clamp-2">
                     {project.desc}
                   </p>
                 </div>
 
-                {/* Bottom Action Button (Exact "VIEW MORE" style from reference) */}
-                <div className="w-full mt-auto pt-3 shrink-0">
+                {/* Bottom Action Button */}
+                <div className="w-full mt-auto pt-2 shrink-0">
                   <a
                     href={project.link}
                     target={project.isExternal ? "_blank" : undefined}
                     rel={project.isExternal ? "noreferrer" : undefined}
                     onClick={(e) => e.stopPropagation()}
-                    className={`w-full py-2.5 sm:py-3 rounded-full text-white text-[11px] sm:text-xs font-bold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg active:scale-95 ${project.btnGradient}`}
+                    className={`w-full py-2 xs:py-2.5 rounded-full text-white text-[10.5px] sm:text-[11px] font-bold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 shadow-sm hover:shadow-md active:scale-95 ${project.btnGradient}`}
                   >
                     <span>{project.btnText}</span>
-                    {project.isExternal ? <ExternalLink className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+                    {project.isExternal ? <ExternalLink className="w-3 h-3" /> : <ArrowRight className="w-3 h-3" />}
                   </a>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPreviewCert({
-                        src: project.mockupImg,
-                        title: project.mockupTitle,
-                        subtitle: project.mockupSubtitle,
-                      });
-                    }}
-                    className="text-[10.5px] sm:text-[11px] text-neutral-400 hover:text-neutral-800 font-medium transition-colors flex items-center justify-center gap-1 mx-auto mt-2 cursor-pointer"
-                  >
-                    <span>Pratinjau Mockup HD</span>
-                    <ZoomIn className="w-3 h-3" />
-                  </button>
                 </div>
               </article>
             );
