@@ -390,13 +390,13 @@ export default function JonnyCzarPortfolioPage() {
     }
   };
 
-  // Moderate Pace Auto-Slide (Bergeser otomatis dengan tempo santai & halus ~ 4.5 detik)
+  // Smooth & Lively Auto-Slide (Jeda lebih ideal ~ 3.0 detik)
   useEffect(() => {
     if (isAutoPlayPaused || activeDetailId !== null) return;
 
     const autoSlideTimer = setInterval(() => {
       setActiveCardIndex((prev) => (prev + 1) % projectList.length);
-    }, 4500);
+    }, 3000);
 
     return () => clearInterval(autoSlideTimer);
   }, [isAutoPlayPaused, activeDetailId, projectList.length]);
@@ -824,7 +824,7 @@ export default function JonnyCzarPortfolioPage() {
 
         {/* 3D AutoPlay Card Slider Stage */}
         <div 
-          className="relative w-full max-w-5xl mx-auto h-[440px] xs:h-[460px] sm:h-[480px] md:h-[500px] flex items-center justify-center overflow-visible select-none py-2"
+          className="relative w-full max-w-5xl mx-auto h-[440px] xs:h-[460px] sm:h-[480px] md:h-[500px] flex items-center justify-center overflow-visible select-none py-2 [perspective:1200px]"
           onMouseEnter={() => setIsAutoPlayPaused(true)}
           onMouseLeave={() => setIsAutoPlayPaused(false)}
           onTouchStart={handleTouchStart}
@@ -859,9 +859,10 @@ export default function JonnyCzarPortfolioPage() {
             const isNeighbor = Math.abs(diff) === 1;
             const isDetailOpen = activeDetailId === project.id;
 
-            // Calculate exact translation and scale
+            // Calculate exact translation, scale, and subtle 3D tilt
             const scale = isActive ? 1.04 : isNeighbor ? 0.88 : 0.72;
             const translateX = `calc(-50% + ${diff * 76}%)`;
+            const rotateY = diff === 0 ? 0 : diff > 0 ? -4.5 : 4.5;
 
             return (
               <article
@@ -881,16 +882,18 @@ export default function JonnyCzarPortfolioPage() {
                     }
                   }
                 }}
-                className={`group absolute top-1/2 left-1/2 w-[215px] xs:w-[230px] sm:w-[250px] md:w-[270px] h-[410px] xs:h-[430px] sm:h-[450px] md:h-[470px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-neutral-900 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform cursor-pointer ${
+                className={`group absolute top-1/2 left-1/2 w-[215px] xs:w-[230px] sm:w-[250px] md:w-[270px] h-[410px] xs:h-[430px] sm:h-[450px] md:h-[470px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-neutral-900 transition-[transform,opacity,box-shadow] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[transform,opacity] cursor-pointer ${
                   isActive
-                    ? 'border-2 border-neutral-900/15 shadow-[0_20px_50px_rgba(0,0,0,0.18)] z-30 opacity-100'
+                    ? 'border-2 border-neutral-900/15 shadow-[0_22px_55px_rgba(0,0,0,0.18)] z-30 opacity-100'
                     : isNeighbor
                       ? 'border border-neutral-200/80 shadow-[0_8px_25px_rgba(0,0,0,0.08)] z-20 opacity-85 hover:opacity-100'
                       : 'border border-neutral-200/60 shadow-[0_6px_16px_rgba(0,0,0,0.04)] z-10 opacity-0 md:opacity-35 pointer-events-none md:pointer-events-auto'
                 }`}
                 style={{
-                  transform: `translate(${translateX}, -50%) scale(${scale})`,
+                  transform: `translate3d(${translateX}, -50%, 0) scale3d(${scale}, ${scale}, 1) rotateY(${rotateY}deg)`,
                   zIndex: isActive ? 30 : isNeighbor ? 20 : 10,
+                  backfaceVisibility: 'hidden',
+                  WebkitBackfaceVisibility: 'hidden',
                 }}
               >
                 {/* Full Mockup Screenshot Image (Fills the entire card cleanly) */}
