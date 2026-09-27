@@ -260,12 +260,14 @@ export default function JonnyCzarPortfolioPage() {
   const scrollEndDebounceTimer = useRef<NodeJS.Timeout | null>(null);
   const safetyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // AutoPlay 3D Card Slider State & Handlers
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  // AutoPlay 3D Card Slider State & Seamless Infinite Loop
+  const [currentIndex, setCurrentIndex] = useState(5); // Start in middle set (index 5)
+  const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
   const [isAutoPlayPaused, setIsAutoPlayPaused] = useState(false);
   const [activeDetailId, setActiveDetailId] = useState<string | null>(null);
   const autoPlayPauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
 
   const projectList = [
     {
@@ -355,7 +357,11 @@ export default function JonnyCzarPortfolioPage() {
     }
   ];
 
-  const pauseAutoPlayTemporarily = (duration = 7000) => {
+  // Extended Clones for Mathematically Infinite & Glitch-Free Coverflow Track
+  const extendedProjects = [...projectList, ...projectList, ...projectList];
+  const activeCardIndex = ((currentIndex % projectList.length) + projectList.length) % projectList.length;
+
+  const pauseAutoPlayTemporarily = (duration = 6000) => {
     setIsAutoPlayPaused(true);
     if (autoPlayPauseTimeoutRef.current) clearTimeout(autoPlayPauseTimeoutRef.current);
     autoPlayPauseTimeoutRef.current = setTimeout(() => {
@@ -364,42 +370,74 @@ export default function JonnyCzarPortfolioPage() {
   };
 
   const scrollCard = (direction: 'prev' | 'next') => {
-    pauseAutoPlayTemporarily(7500);
+    pauseAutoPlayTemporarily(6000);
     setActiveDetailId(null);
-    setActiveCardIndex((prev) => {
-      if (direction === 'prev') {
-        return (prev - 1 + projectList.length) % projectList.length;
-      }
-      return (prev + 1) % projectList.length;
-    });
+    setCurrentIndex((prev) => (direction === 'prev' ? prev - 1 : prev + 1));
+  };
+
+  const scrollToProject = (targetIdx: number) => {
+    pauseAutoPlayTemporarily(6000);
+    setActiveDetailId(null);
+    const currentMod = ((currentIndex % projectList.length) + projectList.length) % projectList.length;
+    let step = targetIdx - currentMod;
+    if (step > projectList.length / 2) step -= projectList.length;
+    if (step < -projectList.length / 2) step += projectList.length;
+    setCurrentIndex((prev) => prev + step);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartXRef.current = e.touches[0].clientX;
-    pauseAutoPlayTemporarily(7000);
+    touchStartYRef.current = e.touches[0].clientY;
+    pauseAutoPlayTemporarily(6000);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartXRef.current === null) return;
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
     const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartYRef.current;
     touchStartXRef.current = null;
-    if (deltaX > 40) {
-      scrollCard('prev');
-    } else if (deltaX < -40) {
-      scrollCard('next');
+    touchStartYRef.current = null;
+
+    // Only swipe if horizontal motion is dominant and exceeds threshold
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 35) {
+      if (deltaX > 0) {
+        scrollCard('prev');
+      } else {
+        scrollCard('next');
+      }
     }
   };
 
-  // Smooth & Lively Auto-Slide (Jeda lebih ideal ~ 3.0 detik)
+  // Seamless Invisible Infinite Reset Loop (Normalizes into middle set [5..9])
+  useEffect(() => {
+    if (currentIndex >= 10 || currentIndex < 5) {
+      const resetTimer = setTimeout(() => {
+        setIsTransitionEnabled(false);
+        setCurrentIndex((prev) => {
+          return ((prev % projectList.length) + projectList.length) % projectList.length + projectList.length;
+        });
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setIsTransitionEnabled(true);
+          });
+        });
+      }, 770);
+
+      return () => clearTimeout(resetTimer);
+    }
+  }, [currentIndex, projectList.length]);
+
+  // Smooth & Lively Auto-Slide (Jeda ideal ~ 2.8s)
   useEffect(() => {
     if (isAutoPlayPaused || activeDetailId !== null) return;
 
     const autoSlideTimer = setInterval(() => {
-      setActiveCardIndex((prev) => (prev + 1) % projectList.length);
-    }, 3000);
+      setCurrentIndex((prev) => prev + 1);
+    }, 2800);
 
     return () => clearInterval(autoSlideTimer);
-  }, [isAutoPlayPaused, activeDetailId, projectList.length]);
+  }, [isAutoPlayPaused, activeDetailId]);
 
   // Smooth Cinematic Morphing Effect (Reliable Infinite Repeat Loop)
   useEffect(() => {
@@ -824,17 +862,21 @@ export default function JonnyCzarPortfolioPage() {
 
         {/* 3D AutoPlay Card Slider Stage */}
         <div 
-          className="relative w-full max-w-5xl mx-auto h-[440px] xs:h-[460px] sm:h-[480px] md:h-[500px] flex items-center justify-center overflow-visible select-none py-2 [perspective:1200px]"
+          className="relative w-full max-w-5xl mx-auto h-[440px] xs:h-[460px] sm:h-[480px] md:h-[500px] flex items-center justify-center overflow-hidden select-none py-2 [--slot-w:175px] sm:[--slot-w:215px]"
           onMouseEnter={() => setIsAutoPlayPaused(true)}
           onMouseLeave={() => setIsAutoPlayPaused(false)}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
+          {/* Subtle Left & Right Vignette Overlays for Cinema Horizon Depth */}
+          <div className="pointer-events-none absolute left-0 inset-y-0 w-8 sm:w-16 bg-gradient-to-r from-white via-white/80 to-transparent z-35" />
+          <div className="pointer-events-none absolute right-0 inset-y-0 w-8 sm:w-16 bg-gradient-to-l from-white via-white/80 to-transparent z-35" />
+
           {/* Navigation Chevron Buttons */}
           <button
             type="button"
             onClick={() => scrollCard('prev')}
-            className="absolute left-0.5 sm:left-2 z-40 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 backdrop-blur-md border border-neutral-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.12)] flex items-center justify-center text-neutral-800 hover:text-black hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="absolute left-1 sm:left-3 z-40 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 backdrop-blur-md border border-neutral-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.12)] flex items-center justify-center text-neutral-800 hover:text-black hover:scale-105 active:scale-95 transition-all cursor-pointer"
             aria-label="Proyek Sebelumnya"
           >
             <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -842,177 +884,189 @@ export default function JonnyCzarPortfolioPage() {
           <button
             type="button"
             onClick={() => scrollCard('next')}
-            className="absolute right-0.5 sm:right-2 z-40 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 backdrop-blur-md border border-neutral-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.12)] flex items-center justify-center text-neutral-800 hover:text-black hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="absolute right-1 sm:right-3 z-40 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/90 backdrop-blur-md border border-neutral-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.12)] flex items-center justify-center text-neutral-800 hover:text-black hover:scale-105 active:scale-95 transition-all cursor-pointer"
             aria-label="Proyek Selanjutnya"
           >
             <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
-          {/* Cards Track with 3D Center-Scale CoverFlow Layout */}
-          {projectList.map((project, idx) => {
-            const n = projectList.length;
-            let diff = idx - activeCardIndex;
-            if (diff > n / 2) diff -= n;
-            if (diff < -n / 2) diff += n;
+          {/* Smooth Hardware-Accelerated Sliding Track (Never Glitches, Never Jumps Backwards) */}
+          <div 
+            className="flex items-center h-full will-change-transform [perspective:1200px]"
+            style={{
+              transform: `translate3d(calc(50% - (var(--slot-w) * ${currentIndex} + var(--slot-w) / 2)), 0, 0)`,
+              transition: isTransitionEnabled 
+                ? 'transform 750ms cubic-bezier(0.22, 1, 0.36, 1)' 
+                : 'none',
+              transformStyle: 'preserve-3d',
+            }}
+          >
+            {extendedProjects.map((project, idx) => {
+              const dist = Math.abs(idx - currentIndex);
+              const isActive = dist === 0;
+              const isNeighbor = dist === 1;
+              const isDetailOpen = activeDetailId === project.id && isActive;
 
-            const isActive = diff === 0;
-            const isNeighbor = Math.abs(diff) === 1;
-            const isDetailOpen = activeDetailId === project.id;
+              // 3D Coverflow values calculated strictly by continuous distance
+              const scale = isActive ? 1.04 : isNeighbor ? 0.88 : 0.72;
+              const rotateY = isActive ? 0 : idx < currentIndex ? 4.5 : -4.5;
+              const zIndex = isActive ? 30 : isNeighbor ? 20 : 10;
 
-            // Calculate exact translation, scale, and subtle 3D tilt
-            const scale = isActive ? 1.04 : isNeighbor ? 0.88 : 0.72;
-            const translateX = `calc(-50% + ${diff * 76}%)`;
-            const rotateY = diff === 0 ? 0 : diff > 0 ? -4.5 : 4.5;
-
-            return (
-              <article
-                key={project.id}
-                id={project.id}
-                onClick={() => {
-                  if (!isActive) {
-                    pauseAutoPlayTemporarily(7000);
-                    setActiveCardIndex(idx);
-                    setActiveDetailId(null);
-                  } else {
-                    // Click on the active card toggles the detail overlay on mobile
-                    const nextDetailState = activeDetailId === project.id ? null : project.id;
-                    setActiveDetailId(nextDetailState);
-                    if (nextDetailState) {
-                      pauseAutoPlayTemporarily(15000);
-                    }
-                  }
-                }}
-                className={`group absolute top-1/2 left-1/2 w-[215px] xs:w-[230px] sm:w-[250px] md:w-[270px] h-[410px] xs:h-[430px] sm:h-[450px] md:h-[470px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-neutral-900 transition-[transform,opacity,box-shadow] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[transform,opacity] cursor-pointer ${
-                  isActive
-                    ? 'border-2 border-neutral-900/15 shadow-[0_22px_55px_rgba(0,0,0,0.18)] z-30 opacity-100'
-                    : isNeighbor
-                      ? 'border border-neutral-200/80 shadow-[0_8px_25px_rgba(0,0,0,0.08)] z-20 opacity-85 hover:opacity-100'
-                      : 'border border-neutral-200/60 shadow-[0_6px_16px_rgba(0,0,0,0.04)] z-10 opacity-0 md:opacity-35 pointer-events-none md:pointer-events-auto'
-                }`}
-                style={{
-                  transform: `translate3d(${translateX}, -50%, 0) scale3d(${scale}, ${scale}, 1) rotateY(${rotateY}deg)`,
-                  zIndex: isActive ? 30 : isNeighbor ? 20 : 10,
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                }}
-              >
-                {/* Full Mockup Screenshot Image (Fills the entire card cleanly) */}
-                <div className="absolute inset-0 w-full h-full bg-neutral-100 overflow-hidden">
-                  <img 
-                    src={project.mockupImg} 
-                    alt={project.title} 
-                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" 
-                  />
-                </div>
-
-                {/* Minimal Default Title Bar at Bottom (Active only when detail overlay is hidden) */}
+              return (
                 <div 
-                  className={`absolute inset-x-0 bottom-0 p-3 sm:p-3.5 pt-10 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex items-center justify-between pointer-events-none transition-opacity duration-300 z-10 ${
-                    isDetailOpen ? 'opacity-0' : 'opacity-100 sm:group-hover:opacity-0'
-                  }`}
+                  key={`${project.id}-${idx}`}
+                  className="w-[var(--slot-w)] h-full shrink-0 flex items-center justify-center relative"
+                  style={{ zIndex }}
                 >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl p-1 shrink-0 shadow-md border border-white/10 flex items-center justify-center ${project.logoBg || 'bg-white'}`}>
-                      <img src={project.logo} alt={project.title} className="w-full h-full object-contain" />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="font-gt-america text-[13px] sm:text-[14px] font-bold text-white tracking-tight leading-snug truncate drop-shadow-sm">
-                        {project.title}
-                      </h3>
-                      <p className="text-[9.5px] sm:text-[10px] text-white/75 font-semibold tracking-wider uppercase truncate">
-                        {project.role}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white/90 text-[11px] shrink-0 font-bold ml-1.5 shadow-sm" title="Ketuk untuk info">
-                    ⓘ
-                  </span>
-                </div>
-
-                {/* Frosted Dark-Grey Glass Detail Layer (Appears on Desktop Hover & Mobile Click) */}
-                <div 
-                  onClick={(e) => {
-                    // On mobile click inside overlay: clicking backdrop closes it, but clicking buttons/links proceeds
-                    if (e.target === e.currentTarget) {
-                      e.stopPropagation();
-                      setActiveDetailId(null);
-                    }
-                  }}
-                  className={`absolute inset-0 z-20 rounded-[inherit] bg-neutral-950/85 backdrop-blur-md p-4 sm:p-5 flex flex-col justify-between text-left transition-all duration-300 ease-out border border-white/10 ${
-                    isDetailOpen 
-                      ? 'opacity-100 pointer-events-auto' 
-                      : 'opacity-0 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto'
-                  }`}
-                >
-                  {/* Top Row: App Logo, Category Pill & Close Button */}
-                  <div className="flex items-start justify-between gap-2 shrink-0">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`w-9 h-9 rounded-xl p-1.5 flex items-center justify-center shadow-md border border-white/10 ${project.logoBg || 'bg-white'}`}>
-                        <img src={project.logo} alt={project.title} className="w-full h-full object-contain" />
-                      </div>
-                      <div>
-                        <span className="inline-block text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/15 text-white border border-white/10">
-                          {project.role}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Mobile Close Button */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
+                  <article
+                    id={isActive ? project.id : undefined}
+                    onClick={() => {
+                      if (!isActive) {
+                        pauseAutoPlayTemporarily(6000);
+                        setCurrentIndex(idx);
                         setActiveDetailId(null);
-                      }}
-                      className="sm:hidden w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors"
-                      aria-label="Tutup Detail"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                      } else {
+                        const nextState = activeDetailId === project.id ? null : project.id;
+                        setActiveDetailId(nextState);
+                        if (nextState) {
+                          pauseAutoPlayTemporarily(15000);
+                        }
+                      }
+                    }}
+                    className={`group w-[215px] xs:w-[230px] sm:w-[250px] md:w-[270px] h-[410px] xs:h-[430px] sm:h-[450px] md:h-[470px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-neutral-900 will-change-[transform,opacity] cursor-pointer relative shrink-0 ${
+                      isActive
+                        ? 'border-2 border-neutral-900/15 shadow-[0_22px_55px_rgba(0,0,0,0.18)] opacity-100'
+                        : isNeighbor
+                          ? 'border border-neutral-200/80 shadow-[0_8px_25px_rgba(0,0,0,0.08)] opacity-85 hover:opacity-100'
+                          : 'border border-neutral-200/60 shadow-[0_6px_16px_rgba(0,0,0,0.04)] opacity-0 md:opacity-30 pointer-events-none md:pointer-events-auto'
+                    }`}
+                    style={{
+                      transform: `scale3d(${scale}, ${scale}, 1) rotateY(${rotateY}deg)`,
+                      transition: isTransitionEnabled
+                        ? 'transform 750ms cubic-bezier(0.22, 1, 0.36, 1), opacity 750ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 750ms cubic-bezier(0.22, 1, 0.36, 1)'
+                        : 'none',
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden',
+                      transformStyle: 'preserve-3d',
+                    }}
+                  >
+                    {/* Full Mockup Screenshot Image */}
+                    <div className="absolute inset-0 w-full h-full bg-neutral-100 overflow-hidden">
+                      <img 
+                        src={project.mockupImg} 
+                        alt={project.title} 
+                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" 
+                      />
+                    </div>
 
-                  {/* Middle: Title & Concise Explanation ("enggak detail banget") */}
-                  <div className="my-auto py-2">
-                    <h3 className="font-gt-america text-[15px] sm:text-[17px] font-bold text-white tracking-tight leading-snug mb-2">
-                      {project.title}
-                    </h3>
-                    <p className="text-[11.5px] sm:text-[12px] text-neutral-300 leading-relaxed font-normal">
-                      {project.desc}
-                    </p>
-                  </div>
-
-                  {/* Bottom: Action Buttons */}
-                  <div className="pt-2 flex flex-col gap-2 shrink-0">
-                    <a
-                      href={project.link}
-                      target={project.isExternal ? "_blank" : undefined}
-                      rel={project.isExternal ? "noreferrer" : undefined}
-                      onClick={(e) => e.stopPropagation()}
-                      className={`w-full py-2.5 rounded-full text-white text-[11px] font-bold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md active:scale-95 ${project.btnGradient}`}
+                    {/* Minimal Default Title Bar at Bottom */}
+                    <div 
+                      className={`absolute inset-x-0 bottom-0 p-3 sm:p-3.5 pt-10 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex items-center justify-between pointer-events-none transition-opacity duration-300 z-10 ${
+                        isDetailOpen ? 'opacity-0' : 'opacity-100 sm:group-hover:opacity-0'
+                      }`}
                     >
-                      <span>{project.btnText}</span>
-                      {project.isExternal ? <ExternalLink className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
-                    </a>
-                    <button
-                      type="button"
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl p-1 shrink-0 shadow-md border border-white/10 flex items-center justify-center ${project.logoBg || 'bg-white'}`}>
+                          <img src={project.logo} alt={project.title} className="w-full h-full object-contain" />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-gt-america text-[13px] sm:text-[14px] font-bold text-white tracking-tight leading-snug truncate drop-shadow-sm">
+                            {project.title}
+                          </h3>
+                          <p className="text-[9.5px] sm:text-[10px] text-white/75 font-semibold tracking-wider uppercase truncate">
+                            {project.role}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white/90 text-[11px] shrink-0 font-bold ml-1.5 shadow-sm" title="Ketuk untuk info">
+                        ⓘ
+                      </span>
+                    </div>
+
+                    {/* Frosted Dark-Grey Glass Detail Layer */}
+                    <div 
                       onClick={(e) => {
-                        e.stopPropagation();
-                        setPreviewCert({
-                          src: project.mockupImg,
-                          title: project.mockupTitle,
-                          subtitle: project.mockupSubtitle,
-                        });
+                        if (e.target === e.currentTarget) {
+                          e.stopPropagation();
+                          setActiveDetailId(null);
+                        }
                       }}
-                      className="w-full py-2 rounded-full bg-white/10 hover:bg-white/20 text-white/90 text-[10.5px] font-semibold transition-colors flex items-center justify-center gap-1.5 border border-white/10 cursor-pointer"
+                      className={`absolute inset-0 z-20 rounded-[inherit] bg-neutral-950/85 backdrop-blur-md p-4 sm:p-5 flex flex-col justify-between text-left transition-all duration-300 ease-out border border-white/10 ${
+                        isDetailOpen 
+                          ? 'opacity-100 pointer-events-auto' 
+                          : 'opacity-0 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto'
+                      }`}
                     >
-                      <ZoomIn className="w-3 h-3" />
-                      <span>Pratinjau Layar Penuh</span>
-                    </button>
-                  </div>
+                      {/* Top Row: App Logo, Category Pill & Close Button */}
+                      <div className="flex items-start justify-between gap-2 shrink-0">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-9 h-9 rounded-xl p-1.5 flex items-center justify-center shadow-md border border-white/10 ${project.logoBg || 'bg-white'}`}>
+                            <img src={project.logo} alt={project.title} className="w-full h-full object-contain" />
+                          </div>
+                          <div>
+                            <span className="inline-block text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/15 text-white border border-white/10">
+                              {project.role}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveDetailId(null);
+                          }}
+                          className="sm:hidden w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors"
+                          aria-label="Tutup Detail"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Middle: Title & Concise Explanation */}
+                      <div className="my-auto py-2">
+                        <h3 className="font-gt-america text-[15px] sm:text-[17px] font-bold text-white tracking-tight leading-snug mb-2">
+                          {project.title}
+                        </h3>
+                        <p className="text-[11.5px] sm:text-[12px] text-neutral-300 leading-relaxed font-normal">
+                          {project.desc}
+                        </p>
+                      </div>
+
+                      {/* Bottom: Action Buttons */}
+                      <div className="pt-2 flex flex-col gap-2 shrink-0">
+                        <a
+                          href={project.link}
+                          target={project.isExternal ? "_blank" : undefined}
+                          rel={project.isExternal ? "noreferrer" : undefined}
+                          onClick={(e) => e.stopPropagation()}
+                          className={`w-full py-2.5 rounded-full text-white text-[11px] font-bold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md active:scale-95 ${project.btnGradient}`}
+                        >
+                          <span>{project.btnText}</span>
+                          {project.isExternal ? <ExternalLink className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+                        </a>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewCert({
+                              src: project.mockupImg,
+                              title: project.mockupTitle,
+                              subtitle: project.mockupSubtitle,
+                            });
+                          }}
+                          className="w-full py-2 rounded-full bg-white/10 hover:bg-white/20 text-white/90 text-[10.5px] font-semibold transition-colors flex items-center justify-center gap-1.5 border border-white/10 cursor-pointer"
+                        >
+                          <ZoomIn className="w-3 h-3" />
+                          <span>Pratinjau Layar Penuh</span>
+                        </button>
+                      </div>
+                    </div>
+                  </article>
                 </div>
-              </article>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Status Hint */}
@@ -1032,8 +1086,7 @@ export default function JonnyCzarPortfolioPage() {
               key={project.id}
               type="button"
               onClick={() => {
-                pauseAutoPlayTemporarily(7000);
-                setActiveCardIndex(idx);
+                scrollToProject(idx);
               }}
               className={`h-2 rounded-full transition-all duration-400 cursor-pointer ${
                 activeCardIndex === idx ? 'w-8 bg-neutral-900 shadow-xs' : 'w-2 bg-neutral-300 hover:bg-neutral-400'
