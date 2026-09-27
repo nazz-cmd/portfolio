@@ -263,6 +263,7 @@ export default function JonnyCzarPortfolioPage() {
   // AutoPlay 3D Card Slider State & Handlers
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [isAutoPlayPaused, setIsAutoPlayPaused] = useState(false);
+  const [activeDetailId, setActiveDetailId] = useState<string | null>(null);
   const autoPlayPauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const touchStartXRef = useRef<number | null>(null);
 
@@ -270,54 +271,51 @@ export default function JonnyCzarPortfolioPage() {
     {
       id: 'card-ablefy',
       title: 'Ablefy Web Platform',
-      role: 'Universal Inclusivity & Tech',
-      desc: 'Platform web inklusif ramah disabilitas (WCAG 2.1 AAA) dengan Text-to-Speech alami, transkripsi real-time, dan modul kamus bahasa isyarat BISINDO.',
+      role: 'Web Inklusivitas & Asistif',
+      desc: 'Platform web ramah disabilitas (WCAG 2.1 AAA) dengan fitur Text-to-Speech alami, transkripsi wicara live, dan kamus isyarat BISINDO.',
       logo: '/projects/ablefy_logo.svg',
       logoBg: 'bg-[#0f172a]',
-      mockupBg: 'bg-[#0f172a]',
       ringColor: 'border-indigo-500 shadow-[0_0_18px_rgba(99,102,241,0.28)]',
       badgeColor: 'text-indigo-600',
       btnGradient: 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/25',
       btnText: 'Kunjungi Website',
       link: 'https://ablefy.vercel.app',
       isExternal: true,
-      mockupImg: '/projects/ablefy_mobile.png',
+      mockupImg: '/projects/ablefy_screenshot.png',
       mockupTitle: 'Ablefy — Universal Inclusivity & Accessibility Platform',
       mockupSubtitle: 'Platform Web Inklusif Multi-Modal Ramah Disabilitas (WCAG 2.1 Level AAA)'
     },
     {
       id: 'card-portal',
       title: 'Manajemen Kelas 2026E',
-      role: 'S1 Bisnis Digital UNESA',
-      desc: 'Sistem informasi perkuliahan real-time untuk mengoordinasikan jadwal, bank materi kuliah, dan tugas harian bagi 38 mahasiswa aktif.',
+      role: 'Sistem Informasi Kampus',
+      desc: 'Portal perkuliahan terpadu untuk memantau jadwal harian, mengelola bank materi, dan mengoordinasikan tugas bagi 38 mahasiswa.',
       logo: '/projects/portal_logo.svg',
       logoBg: 'bg-[#0f172a]',
-      mockupBg: 'bg-[#0f172a]',
       ringColor: 'border-blue-600 shadow-[0_0_18px_rgba(37,99,235,0.28)]',
       badgeColor: 'text-blue-600',
       btnGradient: 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/25',
       btnText: 'Explore Portal',
       link: '/portal',
       isExternal: false,
-      mockupImg: '/projects/portal_jadwal.png',
+      mockupImg: '/projects/portal_screenshot.png',
       mockupTitle: 'Manajemen Kelas 2026E — Portal Perkuliahan',
       mockupSubtitle: 'Jadwal Kuliah Real-Time & Bank Materi S1 Bisnis Digital UNESA'
     },
     {
       id: 'card-keuangan',
       title: 'Aplikasi Keuangan',
-      role: 'FinTech & Dual-Mode Cashflow',
-      desc: 'Pelacak keuangan cerdas mode ganda (Pribadi & Bisnis) dengan visualisasi donut chart pengeluaran dan grafik arus kas bulanan real-time.',
+      role: 'FinTech & Smart Cashflow',
+      desc: 'Pelacak keuangan cerdas mode ganda (Pribadi & Bisnis) dengan visualisasi donut chart pengeluaran dan grafik arus kas bulanan.',
       logo: '/projects/keuangan_logo.png',
       logoBg: 'bg-[#2c7be5]',
-      mockupBg: 'bg-[#f0f9ff]',
       ringColor: 'border-sky-500 shadow-[0_0_18px_rgba(14,165,233,0.28)]',
       badgeColor: 'text-sky-600',
       btnGradient: 'bg-sky-600 hover:bg-sky-700 shadow-sky-500/25',
       btnText: 'Detail Aplikasi',
       link: 'mailto:nazalanmuaffari@gmail.com?subject=Tanya%20Aplikasi%20Keuangan',
       isExternal: true,
-      mockupImg: '/projects/keuangan_beranda.png',
+      mockupImg: '/projects/keuangan_screenshot.png',
       mockupTitle: 'Aplikasi Keuangan — Pelacak Cerdas',
       mockupSubtitle: 'Mode Ganda Pribadi & Bisnis, Visual Donut Chart, Analitik Arus Kas'
     },
@@ -328,14 +326,13 @@ export default function JonnyCzarPortfolioPage() {
       desc: 'Asisten produktivitas harian terintegrasi dengan habit tracker konsistensi, checklist target harian, dan sesi fokus Pomodoro 25 menit.',
       logo: '/projects/mylife_logo.png',
       logoBg: 'bg-white',
-      mockupBg: 'bg-[#ecfdf5]',
       ringColor: 'border-emerald-500 shadow-[0_0_18px_rgba(16,185,129,0.28)]',
       badgeColor: 'text-emerald-600',
       btnGradient: 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/25',
       btnText: 'Detail Aplikasi',
       link: 'mailto:nazalanmuaffari@gmail.com?subject=Tanya%20MyLife%20Productivity',
       isExternal: true,
-      mockupImg: '/projects/mylife_home.png',
+      mockupImg: '/projects/mylife_screenshot.png',
       mockupTitle: 'Aplikasi MyLife Productivity',
       mockupSubtitle: 'Habit Tracker, Target Harian, & Sesi Pomodoro 25 Menit'
     },
@@ -343,17 +340,16 @@ export default function JonnyCzarPortfolioPage() {
       id: 'card-shopee',
       title: 'NAZZGRAM Store',
       role: 'Shopee Star Seller • Rating ★ 4.9',
-      desc: 'Official store ritel e-commerce terpercaya dengan reputasi bintang ★ 4.9 di Shopee selama 5+ tahun, 57.6RB+ pengikut, dan respon chat 95%.',
+      desc: 'Toko ritel e-commerce terpercaya dengan reputasi bintang ★ 4.9 di Shopee selama 5+ tahun, 57.6RB+ pengikut, dan respon chat 95%.',
       logo: '/projects/nazzgram_logo.png',
       logoBg: 'bg-white',
-      mockupBg: 'bg-[#fff7ed]',
       ringColor: 'border-[#ee4d2d] shadow-[0_0_18px_rgba(238,77,45,0.28)]',
       badgeColor: 'text-[#ee4d2d]',
       btnGradient: 'bg-[#ee4d2d] hover:bg-[#d03b1b] shadow-orange-500/25',
       btnText: 'Kunjungi Toko',
       link: 'https://shopee.co.id/nazzgram',
       isExternal: true,
-      mockupImg: '/projects/nazzgram_store.png',
+      mockupImg: '/projects/nazzgram_screenshot.svg',
       mockupTitle: 'Profil Toko Shopee NAZZGRAM',
       mockupSubtitle: '57.6K Pengikut • 7.5K Ulasan • Rating ★ 4.9 • 5 Tahun di Shopee'
     }
@@ -369,6 +365,7 @@ export default function JonnyCzarPortfolioPage() {
 
   const scrollCard = (direction: 'prev' | 'next') => {
     pauseAutoPlayTemporarily(7500);
+    setActiveDetailId(null);
     setActiveCardIndex((prev) => {
       if (direction === 'prev') {
         return (prev - 1 + projectList.length) % projectList.length;
@@ -395,14 +392,14 @@ export default function JonnyCzarPortfolioPage() {
 
   // Moderate Pace Auto-Slide (Bergeser otomatis dengan tempo santai & halus ~ 4.5 detik)
   useEffect(() => {
-    if (isAutoPlayPaused) return;
+    if (isAutoPlayPaused || activeDetailId !== null) return;
 
     const autoSlideTimer = setInterval(() => {
       setActiveCardIndex((prev) => (prev + 1) % projectList.length);
     }, 4500);
 
     return () => clearInterval(autoSlideTimer);
-  }, [isAutoPlayPaused, projectList.length]);
+  }, [isAutoPlayPaused, activeDetailId, projectList.length]);
 
   // Smooth Cinematic Morphing Effect (Reliable Infinite Repeat Loop)
   useEffect(() => {
@@ -827,7 +824,7 @@ export default function JonnyCzarPortfolioPage() {
 
         {/* 3D AutoPlay Card Slider Stage */}
         <div 
-          className="relative w-full max-w-5xl mx-auto h-[420px] xs:h-[435px] sm:h-[455px] flex items-center justify-center overflow-visible select-none py-2"
+          className="relative w-full max-w-5xl mx-auto h-[440px] xs:h-[460px] sm:h-[480px] md:h-[500px] flex items-center justify-center overflow-visible select-none py-2"
           onMouseEnter={() => setIsAutoPlayPaused(true)}
           onMouseLeave={() => setIsAutoPlayPaused(false)}
           onTouchStart={handleTouchStart}
@@ -860,6 +857,7 @@ export default function JonnyCzarPortfolioPage() {
 
             const isActive = diff === 0;
             const isNeighbor = Math.abs(diff) === 1;
+            const isDetailOpen = activeDetailId === project.id;
 
             // Calculate exact translation and scale
             const scale = isActive ? 1.04 : isNeighbor ? 0.88 : 0.72;
@@ -873,78 +871,141 @@ export default function JonnyCzarPortfolioPage() {
                   if (!isActive) {
                     pauseAutoPlayTemporarily(7000);
                     setActiveCardIndex(idx);
+                    setActiveDetailId(null);
+                  } else {
+                    // Click on the active card toggles the detail overlay on mobile
+                    const nextDetailState = activeDetailId === project.id ? null : project.id;
+                    setActiveDetailId(nextDetailState);
+                    if (nextDetailState) {
+                      pauseAutoPlayTemporarily(15000);
+                    }
                   }
                 }}
-                className={`absolute top-1/2 left-1/2 w-[215px] xs:w-[230px] sm:w-[250px] md:w-[270px] h-[370px] xs:h-[385px] sm:h-[400px] rounded-[22px] sm:rounded-[26px] bg-white flex flex-col p-3 sm:p-3.5 justify-between transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform ${
+                className={`group absolute top-1/2 left-1/2 w-[215px] xs:w-[230px] sm:w-[250px] md:w-[270px] h-[410px] xs:h-[430px] sm:h-[450px] md:h-[470px] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-neutral-900 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform cursor-pointer ${
                   isActive
-                    ? 'border border-neutral-900/10 shadow-[0_18px_45px_rgba(0,0,0,0.12)] z-30 opacity-100'
+                    ? 'border-2 border-neutral-900/15 shadow-[0_20px_50px_rgba(0,0,0,0.18)] z-30 opacity-100'
                     : isNeighbor
-                      ? 'border border-neutral-200/80 shadow-[0_8px_24px_rgba(0,0,0,0.06)] z-20 opacity-85 hover:opacity-100 cursor-pointer'
-                      : 'border border-neutral-200/60 shadow-[0_6px_16px_rgba(0,0,0,0.04)] z-10 opacity-0 md:opacity-35 pointer-events-none md:pointer-events-auto cursor-pointer'
+                      ? 'border border-neutral-200/80 shadow-[0_8px_25px_rgba(0,0,0,0.08)] z-20 opacity-85 hover:opacity-100'
+                      : 'border border-neutral-200/60 shadow-[0_6px_16px_rgba(0,0,0,0.04)] z-10 opacity-0 md:opacity-35 pointer-events-none md:pointer-events-auto'
                 }`}
                 style={{
                   transform: `translate(${translateX}, -50%) scale(${scale})`,
                   zIndex: isActive ? 30 : isNeighbor ? 20 : 10,
                 }}
               >
-                {/* Mockup Preview Device Screen (Top Viewport with Real Mockup & Floating Brand Badge) */}
-                <div 
-                  className={`relative w-full h-[145px] xs:h-[155px] sm:h-[165px] rounded-[16px] sm:rounded-[18px] overflow-hidden ${project.mockupBg} border border-neutral-200/80 shadow-xs group/mockup cursor-pointer shrink-0`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setPreviewCert({
-                      src: project.mockupImg,
-                      title: project.mockupTitle,
-                      subtitle: project.mockupSubtitle,
-                    });
-                  }}
-                  title="Klik untuk perbesar pratinjau mockup HD"
-                >
+                {/* Full Mockup Screenshot Image (Fills the entire card cleanly) */}
+                <div className="absolute inset-0 w-full h-full bg-neutral-100 overflow-hidden">
                   <img 
                     src={project.mockupImg} 
                     alt={project.title} 
-                    className={`w-full h-full ${project.id === 'card-shopee' ? 'object-cover object-[20%_center]' : 'object-cover object-top'} transition-transform duration-300 group-hover/mockup:scale-105`} 
+                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]" 
                   />
+                </div>
 
-                  {/* Subtle Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10 pointer-events-none" />
-
-                  {/* Floating Brand Logo Badge at Top-Left */}
-                  <div className="absolute top-2 left-2 w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/95 backdrop-blur-md p-1 shadow-md border border-black/5 flex items-center justify-center">
-                    <img src={project.logo} alt={project.title} className="w-full h-full object-contain" />
+                {/* Minimal Default Title Bar at Bottom (Active only when detail overlay is hidden) */}
+                <div 
+                  className={`absolute inset-x-0 bottom-0 p-3 sm:p-3.5 pt-10 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex items-center justify-between pointer-events-none transition-opacity duration-300 z-10 ${
+                    isDetailOpen ? 'opacity-0' : 'opacity-100 sm:group-hover:opacity-0'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl p-1 shrink-0 shadow-md border border-white/10 flex items-center justify-center ${project.logoBg || 'bg-white'}`}>
+                      <img src={project.logo} alt={project.title} className="w-full h-full object-contain" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-gt-america text-[13px] sm:text-[14px] font-bold text-white tracking-tight leading-snug truncate drop-shadow-sm">
+                        {project.title}
+                      </h3>
+                      <p className="text-[9.5px] sm:text-[10px] text-white/75 font-semibold tracking-wider uppercase truncate">
+                        {project.role}
+                      </p>
+                    </div>
                   </div>
-
-                  {/* Floating Quick Zoom Pill at Top-Right */}
-                  <span className="absolute top-2 right-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-black/60 hover:bg-black text-white flex items-center justify-center shadow-md backdrop-blur-xs transition-colors" title="Perbesar HD">
-                    <ZoomIn className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  <span className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white/90 text-[11px] shrink-0 font-bold ml-1.5 shadow-sm" title="Ketuk untuk info">
+                    ⓘ
                   </span>
                 </div>
 
-                {/* Card Editorial Info */}
-                <div className="w-full flex-1 flex flex-col justify-center text-left pt-2 px-1">
-                  <h3 className="font-gt-america text-[14px] xs:text-[15px] sm:text-[16px] font-bold text-neutral-900 tracking-tight leading-snug line-clamp-1">
-                    {project.title}
-                  </h3>
-                  <p className={`text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider mt-0.5 mb-1 line-clamp-1 ${project.badgeColor}`}>
-                    {project.role}
-                  </p>
-                  <p className="text-[11px] sm:text-[11.5px] text-neutral-500 leading-snug font-normal line-clamp-2">
-                    {project.desc}
-                  </p>
-                </div>
+                {/* Frosted Dark-Grey Glass Detail Layer (Appears on Desktop Hover & Mobile Click) */}
+                <div 
+                  onClick={(e) => {
+                    // On mobile click inside overlay: clicking backdrop closes it, but clicking buttons/links proceeds
+                    if (e.target === e.currentTarget) {
+                      e.stopPropagation();
+                      setActiveDetailId(null);
+                    }
+                  }}
+                  className={`absolute inset-0 z-20 rounded-[inherit] bg-neutral-950/85 backdrop-blur-md p-4 sm:p-5 flex flex-col justify-between text-left transition-all duration-300 ease-out border border-white/10 ${
+                    isDetailOpen 
+                      ? 'opacity-100 pointer-events-auto' 
+                      : 'opacity-0 pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto'
+                  }`}
+                >
+                  {/* Top Row: App Logo, Category Pill & Close Button */}
+                  <div className="flex items-start justify-between gap-2 shrink-0">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-9 h-9 rounded-xl p-1.5 flex items-center justify-center shadow-md border border-white/10 ${project.logoBg || 'bg-white'}`}>
+                        <img src={project.logo} alt={project.title} className="w-full h-full object-contain" />
+                      </div>
+                      <div>
+                        <span className="inline-block text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/15 text-white border border-white/10">
+                          {project.role}
+                        </span>
+                      </div>
+                    </div>
 
-                {/* Bottom Action Button */}
-                <div className="w-full mt-auto pt-2 shrink-0">
-                  <a
-                    href={project.link}
-                    target={project.isExternal ? "_blank" : undefined}
-                    rel={project.isExternal ? "noreferrer" : undefined}
-                    onClick={(e) => e.stopPropagation()}
-                    className={`w-full py-2 xs:py-2.5 rounded-full text-white text-[10.5px] sm:text-[11px] font-bold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1 shadow-sm hover:shadow-md active:scale-95 ${project.btnGradient}`}
-                  >
-                    <span>{project.btnText}</span>
-                    {project.isExternal ? <ExternalLink className="w-3 h-3" /> : <ArrowRight className="w-3 h-3" />}
-                  </a>
+                    {/* Mobile Close Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveDetailId(null);
+                      }}
+                      className="sm:hidden w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors"
+                      aria-label="Tutup Detail"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Middle: Title & Concise Explanation ("enggak detail banget") */}
+                  <div className="my-auto py-2">
+                    <h3 className="font-gt-america text-[15px] sm:text-[17px] font-bold text-white tracking-tight leading-snug mb-2">
+                      {project.title}
+                    </h3>
+                    <p className="text-[11.5px] sm:text-[12px] text-neutral-300 leading-relaxed font-normal">
+                      {project.desc}
+                    </p>
+                  </div>
+
+                  {/* Bottom: Action Buttons */}
+                  <div className="pt-2 flex flex-col gap-2 shrink-0">
+                    <a
+                      href={project.link}
+                      target={project.isExternal ? "_blank" : undefined}
+                      rel={project.isExternal ? "noreferrer" : undefined}
+                      onClick={(e) => e.stopPropagation()}
+                      className={`w-full py-2.5 rounded-full text-white text-[11px] font-bold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md active:scale-95 ${project.btnGradient}`}
+                    >
+                      <span>{project.btnText}</span>
+                      {project.isExternal ? <ExternalLink className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewCert({
+                          src: project.mockupImg,
+                          title: project.mockupTitle,
+                          subtitle: project.mockupSubtitle,
+                        });
+                      }}
+                      className="w-full py-2 rounded-full bg-white/10 hover:bg-white/20 text-white/90 text-[10.5px] font-semibold transition-colors flex items-center justify-center gap-1.5 border border-white/10 cursor-pointer"
+                    >
+                      <ZoomIn className="w-3 h-3" />
+                      <span>Pratinjau Layar Penuh</span>
+                    </button>
+                  </div>
                 </div>
               </article>
             );
@@ -954,11 +1015,11 @@ export default function JonnyCzarPortfolioPage() {
         {/* Status Hint */}
         <div className="flex items-center justify-center gap-4 text-xs text-neutral-400 font-medium mt-3 mb-3">
           <span className="flex items-center gap-1.5">
-            <span className={`w-1.5 h-1.5 rounded-full ${isAutoPlayPaused ? 'bg-amber-400' : 'bg-emerald-500 animate-pulse'}`} />
-            <span>{isAutoPlayPaused ? 'Otomatis bergeser dijeda (interaksi)' : 'Otomatis bergeser aktif'}</span>
+            <span className={`w-1.5 h-1.5 rounded-full ${isAutoPlayPaused || activeDetailId !== null ? 'bg-amber-400' : 'bg-emerald-500 animate-pulse'}`} />
+            <span>{activeDetailId !== null ? 'Melihat detail proyek (ketuk kartu untuk menutup)' : isAutoPlayPaused ? 'Otomatis bergeser dijeda' : 'Otomatis bergeser aktif'}</span>
           </span>
           <span className="hidden sm:inline text-neutral-300">•</span>
-          <span className="hidden sm:inline text-neutral-400">Sentuh atau klik kartu untuk memilih</span>
+          <span className="hidden sm:inline text-neutral-400">Arahkan mouse atau ketuk kartu untuk melihat detail</span>
         </div>
 
         {/* Pagination Dots */}
